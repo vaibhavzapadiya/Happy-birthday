@@ -1,122 +1,76 @@
-const productList = [
-  { id: 1, title: "Fjallraven Backpack", price: 109.95, image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg", qty: 1 },
-  { id: 2, title: "Mens Casual T-Shirts", price: 22.3, image: "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg", qty: 1 },
-  { id: 3, title: "Mens Cotton Jacket", price: 55.99, image: "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg", qty: 1 }
-];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Form</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-let cart = [];
+    <h2>Employee Details Form</h2>
 
-// Function to render products
-function renderProductList() {
-  const productListDiv = document.getElementById('productList');
-  productListDiv.innerHTML = '';
-  
-  productList.forEach((product) => {
-    const productDiv = document.createElement('div');
-    productDiv.className = 'product';
-    productDiv.id = 'item' + product.id;
-    productDiv.innerHTML = `
-      <img src="${product.image}" alt="${product.title}">
-      <div>
-        <h4>${product.title}</h4>
-        <p>$${product.price.toFixed(2)}</p>
-        <div class="controls">
-          <button id="btnDecrement${product.id}" onclick="decrementQty(${product.id})">-</button>
-          <input type="number" id="txtQty${product.id}" value="${product.qty}" min="1" readonly>
-          <button id="btnIncrement${product.id}" onclick="incrementQty(${product.id})">+</button>
-          <button id="btnCart${product.id}" onclick="addToCart(${product.id})">Add to Cart</button>
-        </div>
-      </div>
-    `;
-    productListDiv.appendChild(productDiv);
-  });
-}
+    <form id="employeeForm">
+        <!-- EmployeeID -->
+        <label for="empid">Employee ID:</label>
+        <input type="text" id="empid" name="empid">
+        <span id="spanEmpid"></span><br><br>
 
-// Function to render cart items
-function renderCart() {
-  const cartListDiv = document.getElementById('cartItems');
-  cartListDiv.innerHTML = '';
-  
-  cart.forEach((item) => {
-    const cartItemDiv = document.createElement('div');
-    cartItemDiv.className = 'cart-item';
-    cartItemDiv.id = 'cartItem' + item.id;
-    cartItemDiv.innerHTML = `
-      <img src="${item.image}" alt="${item.title}">
-      <div>
-        <h4>${item.title}</h4>
-        <p>$${item.price.toFixed(2)}</p>
-        <div class="controls">
-          <button id="cartListDecrement${item.id}" onclick="decrementCartQty(${item.id})">-</button>
-          <input type="number" id="cartListtxtQty${item.id}" value="${item.qty}" min="1" readonly>
-          <button id="cartListIncrement${item.id}" onclick="incrementCartQty(${item.id})">+</button>
-          <button id="btnRemove${item.id}" onclick="removeFromCart(${item.id})">Remove</button>
-        </div>
-        <p>Total: $<span id="TotalPrice${item.id}">${(item.qty * item.price).toFixed(2)}</span></p>
-      </div>
-    `;
-    cartListDiv.appendChild(cartItemDiv);
-  });
+        <!-- Employee Name -->
+        <label for="empname">Employee Name:</label>
+        <input type="text" id="empname" name="empname">
+        <span id="spanEmpname"></span><br><br>
 
-  updateTotalPrice();
-}
+        <!-- Age -->
+        <label for="age">Age:</label>
+        <input type="text" id="age" name="age">
+        <span id="spanAge"></span><br><br>
 
-// Function to update total price
-function updateTotalPrice() {
-  const totalPrice = cart.reduce((sum, item) => sum + item.qty * item.price, 0);
-  document.getElementById('TotalPrice').innerText = totalPrice.toFixed(2);
-}
+        <!-- Gender -->
+        <label>Gender:</label>
+        <input type="radio" id="male" name="gender" value="Male"> Male
+        <input type="radio" id="female" name="gender" value="Female"> Female
+        <span id="spanGender"></span><br><br>
 
-// Increment quantity in product list
-function incrementQty(id) {
-  const product = productList.find(p => p.id === id);
-  product.qty += 1;
-  document.getElementById(`txtQty${id}`).value = product.qty;
-}
+        <!-- Designation -->
+        <label for="designation">Designation:</label>
+        <input type="text" id="designation" name="designation">
+        <span id="spanDesignation"></span><br><br>
 
-// Decrement quantity in product list
-function decrementQty(id) {
-  const product = productList.find(p => p.id === id);
-  if (product.qty > 1) {
-    product.qty -= 1;
-    document.getElementById(`txtQty${id}`).value = product.qty;
-  }
-}
+        <!-- Salary -->
+        <label for="salary">Salary:</label>
+        <input type="text" id="salary" name="salary">
+        <span id="spanSalary"></span><br><br>
 
-// Add product to cart
-function addToCart(id) {
-  const product = productList.find(p => p.id === id);
-  cart.push({ ...product });
-  document.getElementById(`btnCart${id}`).disabled = true;
-  renderCart();
-}
+        <!-- Location -->
+        <label for="location">Location:</label>
+        <select id="location" name="location">
+            <option value="">Select Location</option>
+            <option value="Ahmedabad">Ahmedabad</option>
+            <option value="Calcutta">Calcutta</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Mumbai">Mumbai</option>
+        </select>
+        <span id="spanLocation"></span><br><br>
 
-// Increment quantity in cart
-function incrementCartQty(id) {
-  const item = cart.find(c => c.id === id);
-  item.qty += 1;
-  document.getElementById(`cartListtxtQty${id}`).value = item.qty;
-  document.getElementById(`TotalPrice${id}`).innerText = (item.qty * item.price).toFixed(2);
-  updateTotalPrice();
-}
+        <!-- Email ID -->
+        <label for="email">Email ID:</label>
+        <input type="email" id="email" name="email">
+        <span id="spanEmail"></span><br><br>
 
-// Decrement quantity in cart
-function decrementCartQty(id) {
-  const item = cart.find(c => c.id === id);
-  if (item.qty > 1) {
-    item.qty -= 1;
-    document.getElementById(`cartListtxtQty${id}`).value = item.qty;
-    document.getElementById(`TotalPrice${id}`).innerText = (item.qty * item.price).toFixed(2);
-    updateTotalPrice();
-  }
-}
+        <!-- Date of Joining -->
+        <label for="doj">Date of Joining (dd-mm-yyyy):</label>
+        <input type="text" id="doj" name="doj">
+        <span id="spanDoj"></span><br><br>
 
-// Remove item from cart
-function removeFromCart(id) {
-  cart = cart.filter(c => c.id !== id);
-  document.getElementById(`btnCart${id}`).disabled = false;
-  renderCart();
-}
+        <!-- Contact Number -->
+        <label for="contact">Contact Number:</label>
+        <input type="text" id="contact" name="contact">
+        <span id="spanContact"></span><br><br>
 
-// Initialize
-renderProductList();
+        <button type="button" id="btnSubmit" onclick="validateForm()">Submit</button>
+    </form>
+
+    <script src="script.js"></script>
+</body>
+</html>
