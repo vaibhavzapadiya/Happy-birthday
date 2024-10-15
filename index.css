@@ -1,40 +1,8 @@
-body {
-    font-family: Arial, sans-serif;
-}
-
-.container {
-    width: 400px;
-    margin: 50px auto;
-}
-
-h2 {
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin: 10px 0 5px;
-}
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-}
-
-button {
-    margin: 10px 5px;
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-.form-step {
-    display: none;
+.employee-card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 250px;
 }
