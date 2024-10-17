@@ -7,7 +7,7 @@ fetch(apiUrl)
   .then(data => {
     const container = document.getElementById('employee-container');
 
-    // Loop through the employee data and create cards
+    // Loop through the emplohhyee data and create cards
     data.forEach(employee => {
       // Create card element
       const card = document.createElement('div');
