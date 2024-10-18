@@ -1,29 +1,25 @@
-// Example API URL
-const apiUrl = 'https://your-api-url.com/empcore';
+<form id="post_form">
+    <select id="select_user">
+        <option value="">Select User</option>
+    </select>
+    <p id="user_error" style="color: red;"></p>
 
-// Fetch API data
-fetch(apiUrl)
-  .then(response => response.json())
-  .then(data => {
-    const container = document.getElementById('employee-container');
+    <input type="text" id="title" placeholder="Enter title" />
+    <p id="title_error" style="color: red;"></p>
 
-    // Loop through the emplohhyee data and create cards
-    data.forEach(employee => {
-      // Create card element
-      const card = document.createElement('div');
-      card.classList.add('employee-card'); // Add a class for styling
+    <textarea id="description" placeholder="Enter description"></textarea>
+    <p id="description_error" style="color: red;"></p>
 
-      // Card content
-      card.innerHTML = `
-        <h2>${employee.name}</h2>
-        <p><strong>Leave Days:</strong> ${employee.leaveDays}</p>
-        <p><strong>Present Days:</strong> ${employee.presentDays}</p>
-      `;
+    <input type="submit" id="add_post_btn" value="Submit" disabled />
+</form>
 
-      // Append the card to the container
-      container.appendChild(card);
-    });
-  })
-  .catch(error => {
-    console.error('Error fetching employee data:', error);
-  });
+<table id="post_table">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Title</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
