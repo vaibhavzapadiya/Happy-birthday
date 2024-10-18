@@ -1,38 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vite Vanilla JS App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Form</title>
 </head>
 <body>
-  <h1>Split N Cases Example</h1>
-  <script type="text/javascript">
-    function splitNCases(str, cases) {
-      if (!str || !cases || typeof str !== 'string' || typeof cases !== 'number' || cases < 1 || cases > str.length) {
-        return "Invalid input";
-      }
+    <form id="post_form">
+        <select id="select_user">
+            <option value="">Select User</option>
+        </select>
+        <p id="user_error" style="color: red;"></p>
 
-      const lengthPerCase = Math.floor(str.length / cases);
-      const remainder = str.length % cases;
-      let result = [];
-      let startIndex = 0;
+        <input type="text" id="title" placeholder="Enter title" />
+        <p id="title_error" style="color: red;"></p>
 
-      for (let i = 0; i < cases; i++) {
-        let endIndex = startIndex + lengthPerCase + (i < remainder ? 1 : 0);
-        result.push(str.slice(startIndex, endIndex));
-        startIndex = endIndex;
-      }
+        <textarea id="description" placeholder="Enter description"></textarea>
+        <p id="description_error" style="color: red;"></p>
 
-      return result;
-    }
+        <input type="submit" id="add_post_btn" value="Submit" disabled/>
+    </form>
 
-    // Testing the function
-    console.log(splitNCases("Strengthened", 6)); // ➞ ["St", "re", "ng", "th", "en", "ed"]
-    console.log(splitNCases("Unscrupulous", 2)); // ➞ ["Unscru", "pulous" ]
-    console.log(splitNCases("Flavorless", 1)); // ➞ ["Flavorless"]
-    console.log(splitNCases(null, 1)); // ➞ "Invalid input"
-    console.log(splitNCases("Example", null)); // ➞ "Invalid input"
-  </script>
+    <h2>Post List</h2>
+    <table border="1" id="post_table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const userList = [
+            { "id": 6752763, "name": "Achalesvara Patel" },
+            { "id": 6752762, "name": "Suma Desai" },
+            { "id": 6752758, "name": "Pran Nayar" },
+            { "id": 6752755, "name": "Trilochan Banerjee" },
+            { "id": 6752752, "name": "Rajan Bhattathiri" },
+            { "id": 6752750, "name": "Deven Gandhi Ret." },
+            { "id": 6752749, "name": "Bhishma Shukla" },
+            { "id": 6752748, "name": "Himani Jain DC" },
+            { "id": 6752747, "name": "Shresthi Nayar" },
+            { "id": 6752746, "name": "Ms. Chakor Mishra" }
+        ];
+
+        const postList = JSON.parse(localStorage.getItem('posts')) || [];
+
+        // Populate user dropdown
+        const userSelect = document.getElementById('select_user');
+        userList.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = user.name;
+            userSelect.appendChild(option);
+        });
+
+        const postForm = document.getElementById('post_form');
+        const titleInput = document.getElementById('title');
+        const descriptionInput = document.getElementById('description');
+        const submitBtn = document.getElementById('add_post_btn');
+
+        const userError = document.getElementById('user_error');
+        const titleError = document.getElementById('title_error');
+        const descriptionError = document.getElementById('description_error');
+
+        // Validation function
+        function validateForm() {
+            let valid = true;
+
+            if (!userSelect.value) {
+                userError.textContent = 'Username required';
+                valid = false;
+            } else {
+                userError.textContent = '';
+            }
+
+            if (titleInput.value.length < 4) {
+                titleError.textContent = 'Title should have at least 4 characters.';
+                valid = false;
+            } else if (titleInput.value.length > 10) {
+                titleError.textContent = 'Title should have at most 10 characters.';
+                valid = false;
+            } else {
+                titleError.textContent = '';
+            }
+
+            if (descriptionInput.value.length < 10) {
+                descriptionError.textContent = 'Description should have at least 10 characters.';
+                valid = false;
+            } else if (descriptionInput.value.length > 50) {
+                descriptionError.textContent = 'Description should have at most 50 characters.';
+                valid = false;
+            } else {
+                descriptionError.textContent = '';
+            }
+
+            submitBtn.disabled = !valid;
+            return valid;
+        }
+
+        // Display posts in table
+        function displayPosts() {
+            const tbody = document.querySelector('#post_table tbody');
+            tbody.innerHTML = ''; // Clear previous data
+
+            postList.forEach(post => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${post.id}</td>
+                    <td>${post.user_name}</td>
+                    <td>${post.title}</td>
+                    <td>${post.description}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Form input listeners for validation
+        userSelect.addEventListener('change', validateForm);
+        titleInput.addEventListener('input', validateForm);
+        descriptionInput.addEventListener('input', validateForm);
+
+        // Form submit handler
+        postForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            if (validateForm()) {
+                const newPost = {
+                    id: Math.floor(Math.random() * 100000),
+                    user_id: userSelect.value,
+                    user_name: userSelect.options[userSelect.selectedIndex].text,
+                    title: titleInput.value,
+                    description: descriptionInput.value
+                };
+
+                postList.push(newPost);
+                localStorage.setItem('posts', JSON.stringify(postList)); // Save to localStorage
+                displayPosts(); // Update table
+                postForm.reset(); // Reset form
+                validateForm(); // Revalidate form
+            }
+        });
+
+        // Initial display
+        displayPosts();
+    </script>
 </body>
 </html>
