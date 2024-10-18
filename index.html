@@ -1,1 +1,38 @@
-<div id="employee-container"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vite Vanilla JS App</title>
+</head>
+<body>
+  <h1>Split N Cases Example</h1>
+  <script type="text/javascript">
+    function splitNCases(str, cases) {
+      if (!str || !cases || typeof str !== 'string' || typeof cases !== 'number' || cases < 1 || cases > str.length) {
+        return "Invalid input";
+      }
+
+      const lengthPerCase = Math.floor(str.length / cases);
+      const remainder = str.length % cases;
+      let result = [];
+      let startIndex = 0;
+
+      for (let i = 0; i < cases; i++) {
+        let endIndex = startIndex + lengthPerCase + (i < remainder ? 1 : 0);
+        result.push(str.slice(startIndex, endIndex));
+        startIndex = endIndex;
+      }
+
+      return result;
+    }
+
+    // Testing the function
+    console.log(splitNCases("Strengthened", 6)); // ➞ ["St", "re", "ng", "th", "en", "ed"]
+    console.log(splitNCases("Unscrupulous", 2)); // ➞ ["Unscru", "pulous" ]
+    console.log(splitNCases("Flavorless", 1)); // ➞ ["Flavorless"]
+    console.log(splitNCases(null, 1)); // ➞ "Invalid input"
+    console.log(splitNCases("Example", null)); // ➞ "Invalid input"
+  </script>
+</body>
+</html>
