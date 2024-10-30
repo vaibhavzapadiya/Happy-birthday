@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobike Rental</title>
+  <style>
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mobike Rental System</h1>
+
+  <label for="bno">Bike No:</label>
+  <input type="text" id="bno" />
+  <div id="errorbno" class="error"></div>
+
+  <label for="phno">Phone No:</label>
+  <input type="text" id="phno" />
+  <div id="errorphno" class="error"></div>
+
+  <label for="name">Name:</label>
+  <input type="text" id="name" />
+  <div id="errorname" class="error"></div>
+
+  <label for="days">No. of Days:</label>
+  <input type="number" id="days" />
+  <div id="errordays" class="error"></div>
+
+  <button id="btnCompute">Compute</button>
+
+  <h2>Result</h2>
+  <div id="result"></div>
+
+  <script type="module">
+    // Define Mobike class
+    class Mobike {
+      bno;
+      phno;
+      name;
+      days;
+      charge;
+
+      constructor(bno, phno, name, days) {
+        this.bno = bno;
+        this.phno = phno;
+        this.name = name;
+        this.days = days;
+        this.charge = 0;
+      }
+
+      compute() {
+        if (this.days <= 10) {
+          this.charge = this.days * 900;
+        } else if (this.days <= 20) {
+          this.charge = 10 * 900 + (this.days - 10) * 700;
+        } else {
+          this.charge = 10 * 900 + 10 * 700 + (this.days - 20) * 100;
+        }
+      }
+
+      display() {
+        return `Bike No: ${this.bno} | Phone No: ${this.phno} | No. of Days: ${this.days} | Charge: ${this.charge}`;
+      }
+    }
+
+    // Validation function
+    function validateField(fieldId, errorId, fieldName) {
+      const field = document.getElementById(fieldId);
+      const errorField = document.getElementById(errorId);
+      if (!field.value) {
+        errorField.textContent = `${fieldName} cannot be blank.`;
+        return false;
+      }
+      errorField.textContent = ''; // Clear error if input is valid
+      return true;
+    }
+
+    // Compute charge function
+    function computeCharge() {
+      const bno = document.getElementById('bno').value;
+      const phno = document.getElementById('phno').value;
+      const name = document.getElementById('name').value;
+      const days = parseInt(document.getElementById('days').value);
+
+      let valid = true;
+      valid = validateField('bno', 'errorbno', 'Bike No') && valid;
+      valid = validateField('phno', 'errorphno', 'Phone No') && valid;
+      valid = validateField('name', 'errorname', 'Name') && valid;
+      valid = validateField('days', 'errordays', 'No. of Days') && valid;
+
+      if (!valid) return;
+
+      const mobike = new Mobike(bno, phno, name, days);
+      mobike.compute();
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = mobike.display();
+    }
+
+    // Attach event listener to compute button
+    document.getElementById('btnCompute').addEventListener('click', computeCharge);
+  </script>
+</body>
+</html>
