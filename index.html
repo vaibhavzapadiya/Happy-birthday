@@ -7,7 +7,7 @@
 </head>
 <body>
   <h1>Employee Management System</h1>
-  
+
   <form id="employeeForm">
     <label for="employeeName">Name:</label>
     <input type="text" id="employeeName" />
@@ -31,7 +31,6 @@
     <span id="salaryError" class="error"></span><br>
 
     <button type="button" id="addEmployeeButton">Add Employee</button>
-    <button type="button" id="updateEmployeeButton" style="display: none;">Update Employee</button>
   </form>
 
   <table id="employeeTable">
@@ -44,8 +43,10 @@
         <th>Actions</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="employeeTableBody">
     </tbody>
   </table>
+
+  <script src="script.js"></script>
 </body>
 </html>
