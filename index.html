@@ -2,41 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employee Management System</title>
 </head>
 <body>
   <h1>Employee Management System</h1>
-  
-  <!-- Form for Adding/Updating Employee -->
   <form id="employeeForm">
     <label for="employeeId">Employee ID:</label>
-    <input type="text" id="employeeId" />
-    <div id="idError" class="error"></div>
+    <input type="text" id="employeeId" required>
+    <div id="idError" style="color: red;"></div>
 
     <label for="employeeName">Name:</label>
-    <input type="text" id="employeeName" />
-    <div id="nameError" class="error"></div>
+    <input type="text" id="employeeName" required>
+    <div id="nameError" style="color: red;"></div>
 
     <label for="employeeDepartment">Department:</label>
-    <select id="employeeDepartment">
-      <option value="Select a department">Select a department</option>
+    <select id="employeeDepartment" required>
+      <option value="">Select a department</option>
       <option value="Engineering">Engineering</option>
       <option value="HR">HR</option>
       <option value="Sales">Sales</option>
     </select>
-    <div id="departmentError" class="error"></div>
+    <div id="departmentError" style="color: red;"></div>
 
     <label for="employeeSalary">Salary:</label>
-    <input type="number" id="employeeSalary" />
-    <div id="salaryError" class="error"></div>
+    <input type="number" id="employeeSalary" required>
+    <div id="salaryError" style="color: red;"></div>
 
     <button type="button" id="addEmployeeButton">Add Employee</button>
-    <button type="button" id="updateEmployeeButton" style="display:none;">Update Employee</button>
+    <button type="button" id="updateEmployeeButton" style="display: none;">Update Employee</button>
   </form>
 
-  <!-- Table to Display Employees -->
   <h2>Employee List</h2>
-  <table id="employeeTable">
+  <table id="employeeTable" border="1">
     <thead>
       <tr>
         <th>ID</th>
@@ -49,7 +47,6 @@
     <tbody></tbody>
   </table>
 
-  <!-- Link to compiled JavaScript -->
-  <script src="main.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
