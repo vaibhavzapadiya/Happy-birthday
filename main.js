@@ -16,11 +16,11 @@ class EmployeeService {
 
   addEmployee(employee: Employee): void {
     if (this.employees.some((e) => e.id === employee.id)) {
-      this.showError("idError", "Employee ID must be unique.");
+      document.getElementById("idError")!.innerHTML = "Employee ID must be unique.";
       return;
     }
     if (!this.validateSalary(employee.salary, employee.department)) {
-      this.showError("salaryError", "Invalid salary for the selected department.");
+      document.getElementById("salaryError")!.innerHTML = "Invalid salary for the selected department.";
       return;
     }
     this.employees.push(employee);
@@ -38,10 +38,6 @@ class EmployeeService {
     if (department === Department.HR) return salary >= 30000 && salary <= 100000;
     if (department === Department.Sales) return salary >= 40000 && salary <= 150000;
     return false;
-  }
-
-  private showError(controlId: string, message: string) {
-    document.getElementById(controlId)!.innerHTML = message;
   }
 
   private clearErrors() {
@@ -79,14 +75,24 @@ function addEmployee() {
   const department = (document.getElementById("employeeDepartment") as HTMLSelectElement).value as Department;
   const salary = +(document.getElementById("employeeSalary") as HTMLInputElement).value;
 
-  if (!name) service.showError("nameError", "Name is required.");
-  if (!id) service.showError("idError", "Employee ID is required.");
-  if (department === "Select a department") service.showError("departmentError", "Department is required.");
-  if (!salary) service.showError("salaryError", "Salary is required.");
-
-  if (name && id && department !== "Select a department" && salary) {
-    service.addEmployee({ id, name, department, salary });
+  if (!name) {
+    document.getElementById("nameError")!.innerHTML = "Name is required.";
+    return;
   }
+  if (!id) {
+    document.getElementById("idError")!.innerHTML = "Employee ID is required.";
+    return;
+  }
+  if (department === "Select a department") {
+    document.getElementById("departmentError")!.innerHTML = "Department is required.";
+    return;
+  }
+  if (!salary) {
+    document.getElementById("salaryError")!.innerHTML = "Salary is required.";
+    return;
+  }
+
+  service.addEmployee({ id, name, department, salary });
 }
 
 function deleteEmployee(id: string) {
