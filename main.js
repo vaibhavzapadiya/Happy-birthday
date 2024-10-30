@@ -1,11 +1,9 @@
-// Enum for departments
 enum Department {
   Engineering = "Engineering",
   HR = "HR",
   Sales = "Sales",
 }
 
-// Employee Interface
 interface Employee {
   id: string;
   name: string;
@@ -13,163 +11,104 @@ interface Employee {
   salary: number;
 }
 
-// Employee Class
-class EmployeeClass implements Employee {
-  constructor(public id: string, public name: string, public department: Department, public salary: number) {}
-}
-
-// Employee Service for CRUD operations
 class EmployeeService {
   private employees: Employee[] = [];
 
-  addEmployee(employee: Employee): string {
-    if (this.employees.find(emp => emp.id === employee.id)) {
-      return "Employee ID must be unique.";
+  addEmployee(employee: Employee): string | void {
+    if (this.employees.some((e) => e.id === employee.id)) {
+      this.showError("idError", "Employee ID must be unique.");
+      return;
     }
-    if (!this.isValidSalary(employee)) {
-      return "Invalid salary for the selected department.";
+    if (!this.validateSalary(employee.salary, employee.department)) {
+      this.showError("salaryError", "Invalid salary for the selected department.");
+      return;
     }
     this.employees.push(employee);
-    return "Employee added successfully.";
+    this.clearErrors();
+    this.displayEmployees();
+  }
+
+  updateEmployee(employee: Employee): void {
+    const existingEmployee = this.employees.find((e) => e.id === employee.id);
+    if (existingEmployee) {
+      existingEmployee.name = employee.name;
+      existingEmployee.department = employee.department;
+      existingEmployee.salary = employee.salary;
+      this.displayEmployees();
+    }
+  }
+
+  deleteEmployee(id: string): void {
+    this.employees = this.employees.filter((e) => e.id !== id);
+    this.displayEmployees();
   }
 
   getEmployees(): Employee[] {
     return this.employees;
   }
 
-  updateEmployee(updatedEmployee: Employee): string {
-    const employee = this.employees.find(emp => emp.id === updatedEmployee.id);
-    if (employee) {
-      if (!this.isValidSalary(updatedEmployee)) {
-        return "Invalid salary for the selected department.";
-      }
-      employee.name = updatedEmployee.name;
-      employee.department = updatedEmployee.department;
-      employee.salary = updatedEmployee.salary;
-      return "Employee updated successfully.";
-    }
-    return "Employee not found.";
+  private validateSalary(salary: number, department: Department): boolean {
+    if (department === Department.Engineering) return salary >= 50000 && salary <= 200000;
+    if (department === Department.HR) return salary >= 30000 && salary <= 100000;
+    if (department === Department.Sales) return salary >= 40000 && salary <= 150000;
+    return false;
   }
 
-  deleteEmployee(id: string): string {
-    this.employees = this.employees.filter(emp => emp.id !== id);
-    return "Employee deleted successfully.";
+  private showError(controlId: string, message: string) {
+    const element = document.getElementById(controlId);
+    if (element) element.textContent = message;
   }
 
-  private isValidSalary(employee: Employee): boolean {
-    const salaryRanges: { [key in Department]: [number, number] } = {
-      [Department.Engineering]: [50000, 200000],
-      [Department.HR]: [30000, 100000],
-      [Department.Sales]: [40000, 150000],
-    };
-    const [min, max] = salaryRanges[employee.department];
-    return employee.salary >= min && employee.salary <= max;
+  private clearErrors() {
+    this.showError("nameError", "");
+    this.showError("idError", "");
+    this.showError("departmentError", "");
+    this.showError("salaryError", "");
+  }
+
+  displayEmployees() {
+    const tableBody = document.querySelector("#employeeTable tbody") as HTMLTableSectionElement;
+    tableBody.innerHTML = "";
+    this.employees.forEach((employee) => {
+      const row = tableBody.insertRow();
+      row.insertCell(0).textContent = employee.name;
+      row.insertCell(1).textContent = employee.id;
+      row.insertCell(2).textContent = employee.department;
+      row.insertCell(3).textContent = employee.salary.toString();
+      const actionsCell = row.insertCell(4);
+      actionsCell.innerHTML = `
+        <button id="edit${employee.id}">Edit</button>
+        <button id="delete${employee.id}">Delete</button>
+      `;
+    });
   }
 }
 
-// Initialize Service
-const employeeService = new EmployeeService();
-const addEmployeeButton = document.getElementById("addEmployeeButton") as HTMLButtonElement;
-const updateEmployeeButton = document.getElementById("updateEmployeeButton") as HTMLButtonElement;
-let selectedEmployeeId: string | null = null;
+// Initialize
+const service = new EmployeeService();
 
-// Add Employee
-addEmployeeButton.onclick = () => {
-  const employee = getEmployeeFormData();
-  if (employee) {
-    const result = employeeService.addEmployee(employee);
-    if (result === "Employee added successfully.") {
-      renderEmployeeTable();
-      resetForm();
-      alert(result);
-    } else {
-      displayError(result);
-    }
-  }
-};
-
-// Update Employee
-updateEmployeeButton.onclick = () => {
-  if (selectedEmployeeId) {
-    const employee = getEmployeeFormData();
-    if (employee) {
-      employee.id = selectedEmployeeId; // Ensure ID does not change on update
-      const result = employeeService.updateEmployee(employee);
-      if (result === "Employee updated successfully.") {
-        renderEmployeeTable();
-        resetForm();
-        alert(result);
-      } else {
-        displayError(result);
-      }
-    }
-  }
-};
-
-// Helper Functions
-function getEmployeeFormData(): Employee | null {
-  const id = (document.getElementById("employeeId") as HTMLInputElement).value;
+document.getElementById("addEmployeeButton")!.addEventListener("click", () => {
   const name = (document.getElementById("employeeName") as HTMLInputElement).value;
+  const id = (document.getElementById("employeeId") as HTMLInputElement).value;
   const department = (document.getElementById("employeeDepartment") as HTMLSelectElement).value as Department;
-  const salary = parseInt((document.getElementById("employeeSalary") as HTMLInputElement).value);
+  const salary = +(document.getElementById("employeeSalary") as HTMLInputElement).value;
 
-  if (!id || !name || department === "" || isNaN(salary)) {
-    displayError("All fields are required.");
-    return null;
+  if (!name) service.showError("nameError", "Name is required.");
+  if (!id) service.showError("idError", "Employee ID is required.");
+  if (department === "Select a department") service.showError("departmentError", "Department is required.");
+  if (!salary) service.showError("salaryError", "Salary is required.");
+
+  if (name && id && department !== "Select a department" && salary) {
+    service.addEmployee({ id, name, department, salary });
   }
+});
 
-  return new EmployeeClass(id, name, department, salary);
-}
-
-function renderEmployeeTable(): void {
-  const employeeTableBody = document.querySelector("#employeeTable tbody") as HTMLElement;
-  employeeTableBody.innerHTML = "";
-  employeeService.getEmployees().forEach(employee => {
-    const row = `<tr>
-      <td>${employee.id}</td>
-      <td>${employee.name}</td>
-      <td>${employee.department}</td>
-      <td>${employee.salary}</td>
-      <td>
-        <button onclick="editEmployee('${employee.id}')">Edit</button>
-        <button onclick="deleteEmployee('${employee.id}')">Delete</button>
-      </td>
-    </tr>`;
-    employeeTableBody.innerHTML += row;
-  });
-}
-
-function editEmployee(id: string): void {
-  const employee = employeeService.getEmployees().find(emp => emp.id === id);
-  if (employee) {
-    (document.getElementById("employeeId") as HTMLInputElement).value = employee.id;
-    (document.getElementById("employeeName") as HTMLInputElement).value = employee.name;
-    (document.getElementById("employeeDepartment") as HTMLSelectElement).value = employee.department;
-    (document.getElementById("employeeSalary") as HTMLInputElement).value = employee.salary.toString();
-    selectedEmployeeId = id;
-    addEmployeeButton.style.display = "none";
-    updateEmployeeButton.style.display = "inline";
+document.getElementById("employeeTable")!.addEventListener("click", (event) => {
+  const target = event.target as HTMLElement;
+  if (target.id.startsWith("delete")) {
+    const id = target.id.replace("delete", "");
+    if (confirm("Are you sure you want to delete this employee?")) {
+      service.deleteEmployee(id);
+    }
   }
-}
-
-function deleteEmployee(id: string): void {
-  if (confirm("Are you sure you want to delete this employee?")) {
-    const result = employeeService.deleteEmployee(id);
-    alert(result);
-    renderEmployeeTable();
-  }
-}
-
-function displayError(message: string): void {
-  alert(message);
-}
-
-function resetForm(): void {
-  (document.getElementById("employeeForm") as HTMLFormElement).reset();
-  selectedEmployeeId = null;
-  addEmployeeButton.style.display = "inline";
-  updateEmployeeButton.style.display = "none";
-}
-
-// Render initial table
-renderEmployeeTable();
+});
