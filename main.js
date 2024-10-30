@@ -1,131 +1,169 @@
-<form id="post_form">
-    <select id="select_user">
-        <option value="">Select User</option>
-    </select>
-    <p id="user_error" style="color: red;"></p>
+// employee.model.ts
+export enum Department {
+  Engineering = "Engineering",
+  HR = "HR",
+  Sales = "Sales",
+}
 
-    <input type="text" id="title" placeholder="Enter title" />
-    <p id="title_error" style="color: red;"></p>
+export interface IEmployee {
+  id: string;
+  name: string;
+  department: Department;
+  salary: number;
+}
 
-    <textarea id="description" placeholder="Enter description"></textarea>
-    <p id="description_error" style="color: red;"></p>
+export class Employee implements IEmployee {
+  constructor(
+    public id: string,
+    public name: string,
+    public department: Department,
+    public salary: number
+  ) {}
+}
 
-    <input type="submit" id="add_post_btn" value="Submit" disabled />
-</form>
+// employee.service.ts
+import { Employee, Department } from './employee.model';
 
-<table id="post_table">
-    <thead>
-        <tr>
-            <th>User</th>
-            <th>Title</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-const userList = [/*... your user data */];
-const postList = JSON.parse(localStorage.getItem('posts')) || [];
+export class EmployeeService {
+  private employees: Employee[] = [];
 
-// Populate Dropdown
-const userSelect = document.getElementById('select_user');
-userList.forEach(user => {
-    const option = document.createElement('option');
-    option.value = user.id;
-    option.text = user.name;
-    userSelect.appendChild(option);
-});
-
-// Form Validation
-const titleInput = document.getElementById('title');
-const descriptionInput = document.getElementById('description');
-const submitBtn = document.getElementById('add_post_btn');
-
-const errors = {
-    user: document.getElementById('user_error'),
-    title: document.getElementById('title_error'),
-    description: document.getElementById('description_error'),
-};
-
-const validateForm = () => {
-    let isValid = true;
-
-    // User Validation
-    if (userSelect.value === "") {
-        errors.user.textContent = "Username required";
-        isValid = false;
-    } else {
-        errors.user.textContent = "";
+  addEmployee(employee: Employee): string {
+    if (this.employees.some(emp => emp.id === employee.id)) {
+      return "Employee ID must be unique.";
     }
 
-    // Title Validation
-    const titleValue = titleInput.value.trim();
-    if (!titleValue) {
-        errors.title.textContent = "Title required";
-        isValid = false;
-    } else if (titleValue.length < 4) {
-        errors.title.textContent = "Title should have atleast 4 characters.";
-        isValid = false;
-    } else if (titleValue.length > 10) {
-        errors.title.textContent = "Title should have atmost 10 characters.";
-        isValid = false;
-    } else {
-        errors.title.textContent = "";
+    if (!this.isValidSalary(employee.department, employee.salary)) {
+      return `Invalid salary for the ${employee.department} department.`;
     }
 
-    // Description Validation
-    const descriptionValue = descriptionInput.value.trim();
-    if (!descriptionValue) {
-        errors.description.textContent = "Description required";
-        isValid = false;
-    } else if (descriptionValue.length < 10) {
-        errors.description.textContent = "Description should have atleast 10 characters.";
-        isValid = false;
-    } else if (descriptionValue.length > 50) {
-        errors.description.textContent = "Description should have atmost 50 characters.";
-        isValid = false;
-    } else {
-        errors.description.textContent = "";
+    this.employees.push(employee);
+    return "Employee added successfully.";
+  }
+
+  viewEmployees(): Employee[] {
+    return this.employees;
+  }
+
+  updateEmployee(employeeId: string, name: string, department: Department, salary: number): string {
+    const employee = this.employees.find(emp => emp.id === employeeId);
+    if (!employee) return "Employee not found.";
+
+    if (!this.isValidSalary(department, salary)) {
+      return `Invalid salary for the ${department} department.`;
     }
 
-    submitBtn.disabled = !isValid;
-    return isValid;
-};
+    employee.name = name;
+    employee.department = department;
+    employee.salary = salary;
+    return "Employee updated successfully.";
+  }
 
-// Bind posts to table
-const bindPostsToTable = () => {
-    const tbody = document.querySelector("#post_table tbody");
-    tbody.innerHTML = ""; // Clear table
-    postList.forEach(post => {
-        const row = document.createElement('tr');
-        const user = userList.find(user => user.id == post.user_id).name;
-        row.innerHTML = `<td>${user}</td><td>${post.title}</td><td>${post.description}</td>`;
-        tbody.appendChild(row);
-    });
-};
+  deleteEmployee(employeeId: string): string {
+    const index = this.employees.findIndex(emp => emp.id === employeeId);
+    if (index === -1) return "Employee not found.";
 
-// Add Post
-const addPost = (event) => {
-    event.preventDefault();
-    if (!validateForm()) return;
+    this.employees.splice(index, 1);
+    return "Employee deleted successfully.";
+  }
 
-    const newPost = {
-        id: Date.now(),
-        user_id: userSelect.value,
-        user_name: userSelect.options[userSelect.selectedIndex].text,
-        title: titleInput.value,
-        description: descriptionInput.value,
+  private isValidSalary(department: Department, salary: number): boolean {
+    const salaryRanges = {
+      [Department.Engineering]: { min: 50000, max: 200000 },
+      [Department.HR]: { min: 30000, max: 100000 },
+      [Department.Sales]: { min: 40000, max: 150000 },
     };
+    const { min, max } = salaryRanges[department];
+    return salary >= min && salary <= max;
+  }
+}
 
-    postList.push(newPost);
-    localStorage.setItem('posts', JSON.stringify(postList));
-    bindPostsToTable();
-    document.getElementById("post_form").reset();
-    submitBtn.disabled = true;
+// main.ts
+import { EmployeeService } from './employee.service';
+import { Employee, Department } from './employee.model';
+
+const service = new EmployeeService();
+let isEditing = false;
+let currentEmployeeId: string = "";
+
+const formElements = {
+  id: document.getElementById("employeeId") as HTMLInputElement,
+  name: document.getElementById("employeeName") as HTMLInputElement,
+  department: document.getElementById("employeeDepartment") as HTMLSelectElement,
+  salary: document.getElementById("employeeSalary") as HTMLInputElement,
+  addBtn: document.getElementById("addEmployeeButton") as HTMLButtonElement,
+  updateBtn: document.getElementById("updateEmployeeButton") as HTMLButtonElement,
 };
 
-// Event Listeners
-document.getElementById('post_form').addEventListener('input', validateForm);
-document.getElementById('post_form').addEventListener('submit', addPost);
+function addEmployee() {
+  const id = formElements.id.value.trim();
+  const name = formElements.name.value.trim();
+  const department = formElements.department.value as Department;
+  const salary = parseFloat(formElements.salary.value);
 
-// Load saved posts on refresh
-bindPostsToTable();
+  const employee = new Employee(id, name, department, salary);
+  const result = service.addEmployee(employee);
+  alert(result);
+  if (result === "Employee added successfully.") refreshEmployeeList();
+}
+
+function updateEmployee() {
+  const name = formElements.name.value.trim();
+  const department = formElements.department.value as Department;
+  const salary = parseFloat(formElements.salary.value);
+
+  const result = service.updateEmployee(currentEmployeeId, name, department, salary);
+  alert(result);
+  if (result === "Employee updated successfully.") {
+    isEditing = false;
+    formElements.updateBtn.style.display = "none";
+    formElements.addBtn.style.display = "inline-block";
+    refreshEmployeeList();
+  }
+}
+
+function deleteEmployee(id: string) {
+  const result = service.deleteEmployee(id);
+  alert(result);
+  refreshEmployeeList();
+}
+
+function refreshEmployeeList() {
+  const tableBody = document.querySelector("#employeeTable tbody");
+  if (tableBody) {
+    tableBody.innerHTML = "";
+    service.viewEmployees().forEach(employee => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${employee.id}</td>
+        <td>${employee.name}</td>
+        <td>${employee.department}</td>
+        <td>${employee.salary}</td>
+        <td>
+          <button id="edit${employee.id}" onclick="editEmployee('${employee.id}')">Edit</button>
+          <button id="delete${employee.id}" onclick="deleteEmployee('${employee.id}')">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+}
+
+function editEmployee(id: string) {
+  isEditing = true;
+  currentEmployeeId = id;
+  formElements.updateBtn.style.display = "inline-block";
+  formElements.addBtn.style.display = "none";
+  // Populate form with current employee details
+  const employee = service.viewEmployees().find(emp => emp.id === id);
+  if (employee) {
+    formElements.id.value = employee.id;
+    formElements.name.value = employee.name;
+    formElements.department.value = employee.department;
+    formElements.salary.value = employee.salary.toString();
+  }
+}
+
+// Event listeners
+formElements.addBtn.addEventListener("click", addEmployee);
+formElements.updateBtn.addEventListener("click", updateEmployee);
+refreshEmployeeList();
