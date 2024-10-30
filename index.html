@@ -1,119 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobike Rental</title>
+  <meta charset="UTF-8">
+  <title>Employee Management System</title>
 </head>
 <body>
-    <h1>Mobike Rental System</h1>
+  <h1>Employee Management System</h1>
+  
+  <!-- Form for Adding/Updating Employee -->
+  <form id="employeeForm">
+    <label for="employeeId">Employee ID:</label>
+    <input type="text" id="employeeId" />
+    <div id="idError" class="error"></div>
 
-    <div>
-        <label for="bno">Bike No:</label>
-        <input type="text" id="bno" name="bno">
-        <span id="errorbno" style="color:red;"></span>
-    </div>
-    <div>
-        <label for="phno">Phone No:</label>
-        <input type="text" id="phno" name="phno">
-        <span id="errorphno" style="color:red;"></span>
-    </div>
-    <div>
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name">
-        <span id="errorname" style="color:red;"></span>
-    </div>
-    <div>
-        <label for="days">No. of Days:</label>
-        <input type="number" id="days" name="days" min="1">
-        <span id="errordays" style="color:red;"></span>
-    </div>
-    <button id="btnCompute">Compute</button>
-    
-    <div id="result"></div>
+    <label for="employeeName">Name:</label>
+    <input type="text" id="employeeName" />
+    <div id="nameError" class="error"></div>
 
-    <script type="module">
-        class Mobike {
-            bno: string;
-            phno: string;
-            name: string;
-            days: number;
-            charge: number;
+    <label for="employeeDepartment">Department:</label>
+    <select id="employeeDepartment">
+      <option value="Select a department">Select a department</option>
+      <option value="Engineering">Engineering</option>
+      <option value="HR">HR</option>
+      <option value="Sales">Sales</option>
+    </select>
+    <div id="departmentError" class="error"></div>
 
-            constructor(bno: string, phno: string, name: string, days: number) {
-                this.bno = bno;
-                this.phno = phno;
-                this.name = name;
-                this.days = days;
-                this.charge = 0;
-            }
+    <label for="employeeSalary">Salary:</label>
+    <input type="number" id="employeeSalary" />
+    <div id="salaryError" class="error"></div>
 
-            compute(): void {
-                if (this.days <= 10) {
-                    this.charge = this.days * 900;
-                } else if (this.days <= 20) {
-                    this.charge = (10 * 900) + ((this.days - 10) * 700);
-                } else {
-                    this.charge = (10 * 900) + (10 * 700) + ((this.days - 20) * 100);
-                }
-            }
+    <button type="button" id="addEmployeeButton">Add Employee</button>
+    <button type="button" id="updateEmployeeButton" style="display:none;">Update Employee</button>
+  </form>
 
-            display(): string {
-                return `<strong>Result:</strong> <br>
-                        Bike No.: ${this.bno} <br>
-                        Phone No.: ${this.phno} <br>
-                        Name: ${this.name} <br>
-                        No. of Days: ${this.days} <br>
-                        Charge: Rs ${this.charge}`;
-            }
-        }
+  <!-- Table to Display Employees -->
+  <h2>Employee List</h2>
+  <table id="employeeTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Salary</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-        document.getElementById("btnCompute")?.addEventListener("click", () => {
-            // Getting input values
-            const bno = (document.getElementById("bno") as HTMLInputElement).value;
-            const phno = (document.getElementById("phno") as HTMLInputElement).value;
-            const name = (document.getElementById("name") as HTMLInputElement).value;
-            const days = +(document.getElementById("days") as HTMLInputElement).value;
-
-            // Error message fields
-            const errorBno = document.getElementById("errorbno");
-            const errorPhno = document.getElementById("errorphno");
-            const errorName = document.getElementById("errorname");
-            const errorDays = document.getElementById("errordays");
-
-            // Reset error messages
-            errorBno!.innerHTML = "";
-            errorPhno!.innerHTML = "";
-            errorName!.innerHTML = "";
-            errorDays!.innerHTML = "";
-
-            let isValid = true;
-
-            // Validation
-            if (!bno) {
-                errorBno!.innerHTML = "bno cannot be blank.";
-                isValid = false;
-            }
-            if (!phno) {
-                errorPhno!.innerHTML = "phno cannot be blank.";
-                isValid = false;
-            }
-            if (!name) {
-                errorName!.innerHTML = "name cannot be blank.";
-                isValid = false;
-            }
-            if (!days) {
-                errorDays!.innerHTML = "days cannot be blank.";
-                isValid = false;
-            }
-
-            // If all fields are valid
-            if (isValid) {
-                const mobike = new Mobike(bno, phno, name, days);
-                mobike.compute();
-                document.getElementById("result")!.innerHTML = mobike.display();
-            }
-        });
-    </script>
+  <!-- Link to compiled JavaScript -->
+  <script src="main.js"></script>
 </body>
 </html>
