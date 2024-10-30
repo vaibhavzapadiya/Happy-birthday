@@ -1,169 +1,175 @@
-// employee.model.ts
-export enum Department {
+// Enum for departments
+enum Department {
   Engineering = "Engineering",
   HR = "HR",
   Sales = "Sales",
 }
 
-export interface IEmployee {
+// Employee Interface
+interface Employee {
   id: string;
   name: string;
   department: Department;
   salary: number;
 }
 
-export class Employee implements IEmployee {
-  constructor(
-    public id: string,
-    public name: string,
-    public department: Department,
-    public salary: number
-  ) {}
+// Employee Class
+class EmployeeClass implements Employee {
+  constructor(public id: string, public name: string, public department: Department, public salary: number) {}
 }
 
-// employee.service.ts
-import { Employee, Department } from './employee.model';
-
-export class EmployeeService {
+// Employee Service for CRUD operations
+class EmployeeService {
   private employees: Employee[] = [];
 
   addEmployee(employee: Employee): string {
-    if (this.employees.some(emp => emp.id === employee.id)) {
+    if (this.employees.find(emp => emp.id === employee.id)) {
       return "Employee ID must be unique.";
     }
-
-    if (!this.isValidSalary(employee.department, employee.salary)) {
-      return `Invalid salary for the ${employee.department} department.`;
+    if (!this.isValidSalary(employee)) {
+      return "Invalid salary for the selected department.";
     }
-
     this.employees.push(employee);
     return "Employee added successfully.";
   }
 
-  viewEmployees(): Employee[] {
+  getEmployees(): Employee[] {
     return this.employees;
   }
 
-  updateEmployee(employeeId: string, name: string, department: Department, salary: number): string {
-    const employee = this.employees.find(emp => emp.id === employeeId);
-    if (!employee) return "Employee not found.";
-
-    if (!this.isValidSalary(department, salary)) {
-      return `Invalid salary for the ${department} department.`;
+  updateEmployee(updatedEmployee: Employee): string {
+    const employee = this.employees.find(emp => emp.id === updatedEmployee.id);
+    if (employee) {
+      if (!this.isValidSalary(updatedEmployee)) {
+        return "Invalid salary for the selected department.";
+      }
+      employee.name = updatedEmployee.name;
+      employee.department = updatedEmployee.department;
+      employee.salary = updatedEmployee.salary;
+      return "Employee updated successfully.";
     }
-
-    employee.name = name;
-    employee.department = department;
-    employee.salary = salary;
-    return "Employee updated successfully.";
+    return "Employee not found.";
   }
 
-  deleteEmployee(employeeId: string): string {
-    const index = this.employees.findIndex(emp => emp.id === employeeId);
-    if (index === -1) return "Employee not found.";
-
-    this.employees.splice(index, 1);
+  deleteEmployee(id: string): string {
+    this.employees = this.employees.filter(emp => emp.id !== id);
     return "Employee deleted successfully.";
   }
 
-  private isValidSalary(department: Department, salary: number): boolean {
-    const salaryRanges = {
-      [Department.Engineering]: { min: 50000, max: 200000 },
-      [Department.HR]: { min: 30000, max: 100000 },
-      [Department.Sales]: { min: 40000, max: 150000 },
+  private isValidSalary(employee: Employee): boolean {
+    const salaryRanges: { [key in Department]: [number, number] } = {
+      [Department.Engineering]: [50000, 200000],
+      [Department.HR]: [30000, 100000],
+      [Department.Sales]: [40000, 150000],
     };
-    const { min, max } = salaryRanges[department];
-    return salary >= min && salary <= max;
+    const [min, max] = salaryRanges[employee.department];
+    return employee.salary >= min && employee.salary <= max;
   }
 }
 
-// main.ts
-import { EmployeeService } from './employee.service';
-import { Employee, Department } from './employee.model';
+// Initialize Service
+const employeeService = new EmployeeService();
+const addEmployeeButton = document.getElementById("addEmployeeButton") as HTMLButtonElement;
+const updateEmployeeButton = document.getElementById("updateEmployeeButton") as HTMLButtonElement;
+let selectedEmployeeId: string | null = null;
 
-const service = new EmployeeService();
-let isEditing = false;
-let currentEmployeeId: string = "";
-
-const formElements = {
-  id: document.getElementById("employeeId") as HTMLInputElement,
-  name: document.getElementById("employeeName") as HTMLInputElement,
-  department: document.getElementById("employeeDepartment") as HTMLSelectElement,
-  salary: document.getElementById("employeeSalary") as HTMLInputElement,
-  addBtn: document.getElementById("addEmployeeButton") as HTMLButtonElement,
-  updateBtn: document.getElementById("updateEmployeeButton") as HTMLButtonElement,
+// Add Employee
+addEmployeeButton.onclick = () => {
+  const employee = getEmployeeFormData();
+  if (employee) {
+    const result = employeeService.addEmployee(employee);
+    if (result === "Employee added successfully.") {
+      renderEmployeeTable();
+      resetForm();
+      alert(result);
+    } else {
+      displayError(result);
+    }
+  }
 };
 
-function addEmployee() {
-  const id = formElements.id.value.trim();
-  const name = formElements.name.value.trim();
-  const department = formElements.department.value as Department;
-  const salary = parseFloat(formElements.salary.value);
-
-  const employee = new Employee(id, name, department, salary);
-  const result = service.addEmployee(employee);
-  alert(result);
-  if (result === "Employee added successfully.") refreshEmployeeList();
-}
-
-function updateEmployee() {
-  const name = formElements.name.value.trim();
-  const department = formElements.department.value as Department;
-  const salary = parseFloat(formElements.salary.value);
-
-  const result = service.updateEmployee(currentEmployeeId, name, department, salary);
-  alert(result);
-  if (result === "Employee updated successfully.") {
-    isEditing = false;
-    formElements.updateBtn.style.display = "none";
-    formElements.addBtn.style.display = "inline-block";
-    refreshEmployeeList();
+// Update Employee
+updateEmployeeButton.onclick = () => {
+  if (selectedEmployeeId) {
+    const employee = getEmployeeFormData();
+    if (employee) {
+      employee.id = selectedEmployeeId; // Ensure ID does not change on update
+      const result = employeeService.updateEmployee(employee);
+      if (result === "Employee updated successfully.") {
+        renderEmployeeTable();
+        resetForm();
+        alert(result);
+      } else {
+        displayError(result);
+      }
+    }
   }
-}
+};
 
-function deleteEmployee(id: string) {
-  const result = service.deleteEmployee(id);
-  alert(result);
-  refreshEmployeeList();
-}
+// Helper Functions
+function getEmployeeFormData(): Employee | null {
+  const id = (document.getElementById("employeeId") as HTMLInputElement).value;
+  const name = (document.getElementById("employeeName") as HTMLInputElement).value;
+  const department = (document.getElementById("employeeDepartment") as HTMLSelectElement).value as Department;
+  const salary = parseInt((document.getElementById("employeeSalary") as HTMLInputElement).value);
 
-function refreshEmployeeList() {
-  const tableBody = document.querySelector("#employeeTable tbody");
-  if (tableBody) {
-    tableBody.innerHTML = "";
-    service.viewEmployees().forEach(employee => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${employee.id}</td>
-        <td>${employee.name}</td>
-        <td>${employee.department}</td>
-        <td>${employee.salary}</td>
-        <td>
-          <button id="edit${employee.id}" onclick="editEmployee('${employee.id}')">Edit</button>
-          <button id="delete${employee.id}" onclick="deleteEmployee('${employee.id}')">Delete</button>
-        </td>
-      `;
-      tableBody.appendChild(row);
-    });
+  if (!id || !name || department === "" || isNaN(salary)) {
+    displayError("All fields are required.");
+    return null;
   }
+
+  return new EmployeeClass(id, name, department, salary);
 }
 
-function editEmployee(id: string) {
-  isEditing = true;
-  currentEmployeeId = id;
-  formElements.updateBtn.style.display = "inline-block";
-  formElements.addBtn.style.display = "none";
-  // Populate form with current employee details
-  const employee = service.viewEmployees().find(emp => emp.id === id);
+function renderEmployeeTable(): void {
+  const employeeTableBody = document.querySelector("#employeeTable tbody") as HTMLElement;
+  employeeTableBody.innerHTML = "";
+  employeeService.getEmployees().forEach(employee => {
+    const row = `<tr>
+      <td>${employee.id}</td>
+      <td>${employee.name}</td>
+      <td>${employee.department}</td>
+      <td>${employee.salary}</td>
+      <td>
+        <button onclick="editEmployee('${employee.id}')">Edit</button>
+        <button onclick="deleteEmployee('${employee.id}')">Delete</button>
+      </td>
+    </tr>`;
+    employeeTableBody.innerHTML += row;
+  });
+}
+
+function editEmployee(id: string): void {
+  const employee = employeeService.getEmployees().find(emp => emp.id === id);
   if (employee) {
-    formElements.id.value = employee.id;
-    formElements.name.value = employee.name;
-    formElements.department.value = employee.department;
-    formElements.salary.value = employee.salary.toString();
+    (document.getElementById("employeeId") as HTMLInputElement).value = employee.id;
+    (document.getElementById("employeeName") as HTMLInputElement).value = employee.name;
+    (document.getElementById("employeeDepartment") as HTMLSelectElement).value = employee.department;
+    (document.getElementById("employeeSalary") as HTMLInputElement).value = employee.salary.toString();
+    selectedEmployeeId = id;
+    addEmployeeButton.style.display = "none";
+    updateEmployeeButton.style.display = "inline";
   }
 }
 
-// Event listeners
-formElements.addBtn.addEventListener("click", addEmployee);
-formElements.updateBtn.addEventListener("click", updateEmployee);
-refreshEmployeeList();
+function deleteEmployee(id: string): void {
+  if (confirm("Are you sure you want to delete this employee?")) {
+    const result = employeeService.deleteEmployee(id);
+    alert(result);
+    renderEmployeeTable();
+  }
+}
+
+function displayError(message: string): void {
+  alert(message);
+}
+
+function resetForm(): void {
+  (document.getElementById("employeeForm") as HTMLFormElement).reset();
+  selectedEmployeeId = null;
+  addEmployeeButton.style.display = "inline";
+  updateEmployeeButton.style.display = "none";
+}
+
+// Render initial table
+renderEmployeeTable();
