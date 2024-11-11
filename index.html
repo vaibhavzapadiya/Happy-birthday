@@ -1,7 +1,50 @@
-function fizzBuzz(number){
-	let arr = [];
-	for (let i = 1; i <= number; i++) {
-		arr.push(i % 15 == 0 ? "FizzBuzz": i % 5 == 0 ? "Buzz": i % 3 == 0 ? "Fizz" : i);
-	}
-	return arr
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Tracker</title>
+  <style>
+    .error { color: red; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>Budget Tracker</h1>
+  <h2>Total Balance: <span id="balanceDisplay">5000</span> RS</h2>
+
+  <form id="budgetForm">
+    <label for="amountInput">Amount:</label>
+    <input type="number" id="amountInput">
+    <div id="amountError" class="error"></div>
+
+    <label for="categorySelect">Category:</label>
+    <select id="categorySelect">
+      <option value="">Select</option>
+      <option value="Income">Income</option>
+      <option value="Expense">Expense</option>
+    </select>
+    <div id="categoryError" class="error"></div>
+
+    <label for="descriptionInput">Description:</label>
+    <input type="text" id="descriptionInput">
+    <div id="descriptionError" class="error"></div>
+
+    <button type="button" id="addButton">Add Entry</button>
+  </form>
+
+  <h3>Budget Entries</h3>
+  <table id="budgetTable">
+    <thead>
+      <tr>
+        <th>Amount</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="script.js"></script>
+</body>
+</html>
