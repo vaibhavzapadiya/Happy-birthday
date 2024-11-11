@@ -1,52 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Management System</title>
-</head>
-<body>
-  <h1>Employee Management System</h1>
-
-  <form id="employeeForm">
-    <label for="employeeName">Name:</label>
-    <input type="text" id="employeeName" />
-    <span id="nameError" class="error"></span><br>
-
-    <label for="employeeId">Employee ID:</label>
-    <input type="text" id="employeeId" />
-    <span id="idError" class="error"></span><br>
-
-    <label for="employeeDepartment">Department:</label>
-    <select id="employeeDepartment">
-      <option value="Select a department">Select a department</option>
-      <option value="Engineering">Engineering</option>
-      <option value="HR">HR</option>
-      <option value="Sales">Sales</option>
-    </select>
-    <span id="departmentError" class="error"></span><br>
-
-    <label for="employeeSalary">Salary:</label>
-    <input type="number" id="employeeSalary" />
-    <span id="salaryError" class="error"></span><br>
-
-    <button type="button" id="addEmployeeButton">Add Employee</button>
-  </form>
-
-  <table id="employeeTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Employee ID</th>
-        <th>Department</th>
-        <th>Salary</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="employeeTableBody">
-    </tbody>
-  </table>
-
-  <script src="script.js"></script>
-</body>
-</html>
+function fizzBuzz(number){
+	let arr = [];
+	for (let i = 1; i <= number; i++) {
+		arr.push(i % 15 == 0 ? "FizzBuzz": i % 5 == 0 ? "Buzz": i % 3 == 0 ? "Fizz" : i);
+	}
+	return arr
+}
