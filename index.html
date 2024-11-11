@@ -1,50 +1,162 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Budget Tracker</title>
-  <style>
-    .error { color: red; font-size: 0.9em; }
-  </style>
-</head>
-<body>
-  <h1>Budget Tracker</h1>
-  <h2>Total Balance: <span id="balanceDisplay">5000</span> RS</h2>
+let entries = JSON.parse(localStorage.getItem('budgetEntries')) || [];
+let initialBalance = 5000;
 
-  <form id="budgetForm">
-    <label for="amountInput">Amount:</label>
-    <input type="number" id="amountInput">
-    <div id="amountError" class="error"></div>
+function calculateBalance() {
+  let totalIncome = entries.filter(entry => entry.category === 'Income')
+                           .reduce((sum, entry) => sum + entry.amount, 0);
+  let totalExpenses = entries.filter(entry => entry.category === 'Expense')
+                             .reduce((sum, entry) => sum + Math.abs(entry.amount), 0);
+  return initialBalance + totalIncome - totalExpenses;
+}
 
-    <label for="categorySelect">Category:</label>
-    <select id="categorySelect">
-      <option value="">Select</option>
-      <option value="Income">Income</option>
-      <option value="Expense">Expense</option>
-    </select>
-    <div id="categoryError" class="error"></div>
+function displayBalance() {
+  document.getElementById('balanceDisplay').textContent = calculateBalance();
+}
 
-    <label for="descriptionInput">Description:</label>
-    <input type="text" id="descriptionInput">
-    <div id="descriptionError" class="error"></div>
+function displayEntries() {
+  const tbody = document.querySelector('#budgetTable tbody');
+  tbody.innerHTML = '';
 
-    <button type="button" id="addButton">Add Entry</button>
-  </form>
+  entries.forEach(entry => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${entry.amount} RS</td>
+      <td>${entry.category}</td>
+      <td>${entry.description}</td>
+      <td>
+        <button onclick="editEntry(${entry.id})">Edit</button>
+        <button onclick="deleteEntry(${entry.id})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
 
-  <h3>Budget Entries</h3>
-  <table id="budgetTable">
-    <thead>
-      <tr>
-        <th>Amount</th>
-        <th>Category</th>
-        <th>Description</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+function addEntry() {
+  const amountInput = document.getElementById('amountInput');
+  const categorySelect = document.getElementById('categorySelect');
+  const descriptionInput = document.getElementById('descriptionInput');
 
-  <script src="script.js"></script>
-</body>
-</html>
+  const amount = parseFloat(amountInput.value);
+  const category = categorySelect.value;
+  const description = descriptionInput.value.trim();
+  const currentBalance = calculateBalance();
+
+  // Validation
+  let isValid = true;
+  document.getElementById('amountError').textContent = '';
+  document.getElementById('categoryError').textContent = '';
+  document.getElementById('descriptionError').textContent = '';
+
+  if (isNaN(amount) || (category === 'Income' && amount <= 0) || (category === 'Expense' && amount >= 0)) {
+    document.getElementById('amountError').textContent = 
+      'Amount must be a valid number and greater than 0 for Income or less than 0 for Expense.';
+    isValid = false;
+  }
+  if (!category) {
+    document.getElementById('categoryError').textContent = 'Please select a valid category (Income or Expense).';
+    isValid = false;
+  }
+  if (!description) {
+    document.getElementById('descriptionError').textContent = 'Description cannot be empty.';
+    isValid = false;
+  }
+  if (category === 'Expense' && Math.abs(amount) > currentBalance) {
+    document.getElementById('amountError').textContent = 'Expense cannot exceed the available balance.';
+    isValid = false;
+  }
+
+  if (!isValid) return;
+
+  const entry = {
+    id: Date.now(),
+    amount: category === 'Expense' ? -Math.abs(amount) : Math.abs(amount),
+    category,
+    description
+  };
+
+  entries.push(entry);
+  localStorage.setItem('budgetEntries', JSON.stringify(entries));
+  displayEntries();
+  displayBalance();
+
+  amountInput.value = '';
+  categorySelect.value = '';
+  descriptionInput.value = '';
+}
+
+function editEntry(id) {
+  const entry = entries.find(entry => entry.id === id);
+  if (!entry) return;
+
+  document.getElementById('amountInput').value = Math.abs(entry.amount);
+  document.getElementById('categorySelect').value = entry.category;
+  document.getElementById('descriptionInput').value = entry.description;
+
+  document.getElementById('addButton').textContent = 'Save Changes';
+  document.getElementById('addButton').onclick = function() {
+    updateEntry(id);
+  };
+}
+
+function updateEntry(id) {
+  const amountInput = document.getElementById('amountInput');
+  const categorySelect = document.getElementById('categorySelect');
+  const descriptionInput = document.getElementById('descriptionInput');
+
+  const amount = parseFloat(amountInput.value);
+  const category = categorySelect.value;
+  const description = descriptionInput.value.trim();
+  const currentBalance = calculateBalance() + Math.abs(entries.find(entry => entry.id === id).amount);
+
+  let isValid = true;
+  document.getElementById('amountError').textContent = '';
+  document.getElementById('categoryError').textContent = '';
+  document.getElementById('descriptionError').textContent = '';
+
+  if (isNaN(amount) || (category === 'Income' && amount <= 0) || (category === 'Expense' && amount >= 0)) {
+    document.getElementById('amountError').textContent = 
+      'Amount must be a valid number and greater than 0 for Income or less than 0 for Expense.';
+    isValid = false;
+  }
+  if (!category) {
+    document.getElementById('categoryError').textContent = 'Please select a valid category (Income or Expense).';
+    isValid = false;
+  }
+  if (!description) {
+    document.getElementById('descriptionError').textContent = 'Description cannot be empty.';
+    isValid = false;
+  }
+  if (category === 'Expense' && Math.abs(amount) > currentBalance) {
+    document.getElementById('amountError').textContent = 'Expense cannot exceed the available balance.';
+    isValid = false;
+  }
+
+  if (!isValid) return;
+
+  const entry = entries.find(entry => entry.id === id);
+  entry.amount = category === 'Expense' ? -Math.abs(amount) : Math.abs(amount);
+  entry.category = category;
+  entry.description = description;
+
+  localStorage.setItem('budgetEntries', JSON.stringify(entries));
+  displayEntries();
+  displayBalance();
+
+  document.getElementById('addButton').textContent = 'Add Entry';
+  document.getElementById('addButton').onclick = addEntry;
+  amountInput.value = '';
+  categorySelect.value = '';
+  descriptionInput.value = '';
+}
+
+function deleteEntry(id) {
+  entries = entries.filter(entry => entry.id !== id);
+  localStorage.setItem('budgetEntries', JSON.stringify(entries));
+  displayEntries();
+  displayBalance();
+}
+
+document.getElementById('addButton').addEventListener('click', addEntry);
+displayEntries();
+displayBalance();
