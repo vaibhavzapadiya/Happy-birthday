@@ -1,0 +1,11 @@
+SELECT TOP 1 
+    E.EventName, 
+    COUNT(EP.ParticipantID) AS ParticipantCount
+FROM 
+    Events E
+JOIN 
+    EventParticipants EP ON E.EventID = EP.EventID
+GROUP BY 
+    E.EventName
+ORDER BY 
+    ParticipantCount DESC;
