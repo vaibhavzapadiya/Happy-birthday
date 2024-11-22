@@ -1,11 +1,11 @@
-SELECT TOP 1 
-    E.EventName, 
-    COUNT(EP.ParticipantID) AS ParticipantCount
-FROM 
-    Events E
-JOIN 
-    EventParticipants EP ON E.EventID = EP.EventID
-GROUP BY 
-    E.EventName
-ORDER BY 
-    ParticipantCount DESC;
+ Create a signup component that contains fields for Name, Address, and PanNumber, and interpolates these pieces of information into a paragraph.
+
+   Name Input: Control ID -> #name-input
+   Address Input: Control ID -> #address-input
+   PanNumber Input: Control ID -> #pan-input
+   Submit Button: Control ID -> #submit-btn
+   Displayed Information Output: Control ID -> #displayed-info -> Default value -> ""
+
+   *The displayed information should be updated after clicking the Submit button, showing the entered values for Name, Address, and PanNumber in the paragraph.
+
+Example: If the user enters "John Doe" for Name, "123 Main St" for Address, and "ABCDE1234F" for PanNumber and clicks Submit, the displayed information should be "Name: John Doe, Address: 123 Main St, PanNumber: ABCDE1234F".
