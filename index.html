@@ -1,9 +1,33 @@
-Create a student Model interface with field( ID,Name,Age,Average,grade,Active ) StudentList Component will create an array of student type.Display an array with NGFor in table. Grade wise color should be given using ngSwitch and ngClass or ngStyle. Only active should displayed using ngIf.
-
-Student Table: control ID -> #student-table
-
-* Use Below json 
-students=[
-   { ID: 1, Name: 'John', Age: 20, Average: 85, Grade: 'A', Active: true },
-   { ID: 2, Name: 'Alice', Age: 22, Average: 75, Grade: 'B', Active: false }
- ];
+<table id="student-table" border="1" style="width: 100%; text-align: left;">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Age</th>
+      <th>Average</th>
+      <th>Grade</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr
+      *ngFor="let student of students"
+      *ngIf="student.Active"
+      [ngClass]="{
+        'grade-a': student.Grade === 'A',
+        'grade-b': student.Grade === 'B'
+      }"
+    >
+      <td>{{ student.ID }}</td>
+      <td>{{ student.Name }}</td>
+      <td>{{ student.Age }}</td>
+      <td>{{ student.Average }}</td>
+      <td [ngSwitch]="student.Grade">
+        <span *ngSwitchCase="'A'">A</span>
+        <span *ngSwitchCase="'B'">B</span>
+        <span *ngSwitchDefault>Other</span>
+      </td>
+      <td>{{ student.Active ? 'Active' : 'Inactive' }}</td>
+    </tr>
+  </tbody>
+</table>
