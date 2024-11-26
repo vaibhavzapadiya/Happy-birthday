@@ -1,96 +1,54 @@
-<form #leaveForm="ngForm" (ngSubmit)="onSubmit(leaveForm)">
-  <!-- Employee Name -->
-  <div>
-    <label for="employeeName">Employee Name</label>
-    <input 
-      id="employeeName" 
-      type="text" 
-      name="employeeName" 
-      [(ngModel)]="formData.employeeName" 
-      required 
-      #employeeName="ngModel" />
-    <div *ngIf="employeeName.invalid && employeeName.touched">
-      Employee Name is required.
-    </div>
-  </div>
+import { Component } from '@angular/core';
 
-  <!-- Leave Type -->
-  <div>
-    <label for="leaveType">Leave Type</label>
-    <select 
-      id="leaveType" 
-      name="leaveType" 
-      [(ngModel)]="formData.leaveType" 
-      required 
-      (change)="updateLeaveBalance()"
-      #leaveType="ngModel">
-      <option value="" disabled selected>Select Leave Type</option>
-      <option value="Paid Leave">Paid Leave</option>
-      <option value="Sick Leave">Sick Leave</option>
-      <option value="Casual Leave">Casual Leave</option>
-    </select>
-    <div *ngIf="leaveType.invalid && leaveType.touched">
-      Leave Type is required.
-    </div>
-  </div>
+@Component({
+  selector: 'app-leave-application',
+  templateUrl: './leave-application.component.html',
+  styleUrls: ['./leave-application.component.css']
+})
+export class LeaveApplicationComponent {
+  // Form Data Model
+  formData = {
+    employeeName: '',
+    leaveType: '',
+    startDate: '',
+    endDate: '',
+    leaveReason: ''
+  };
 
-  <!-- Leave Start Date -->
-  <div>
-    <label for="startDate">Start Date</label>
-    <input 
-      id="startDate" 
-      type="date" 
-      name="startDate" 
-      [(ngModel)]="formData.startDate" 
-      required 
-      #startDate="ngModel" />
-    <div *ngIf="startDate.invalid && startDate.touched">
-      Start Date is required.
-    </div>
-  </div>
+  leaveBalance = ''; // Leave Balance Display
+  leaveApprovalStatus = ''; // Leave Approval Status Display
+  leaveTypes = {
+    'Paid Leave': 12,
+    'Sick Leave': 8,
+    'Casual Leave': 5
+  };
 
-  <!-- Leave End Date -->
-  <div>
-    <label for="endDate">End Date</label>
-    <input 
-      id="endDate" 
-      type="date" 
-      name="endDate" 
-      [(ngModel)]="formData.endDate" 
-      required 
-      (change)="calculateLeaveDuration()"
-      #endDate="ngModel" />
-    <div *ngIf="endDate.invalid && endDate.touched">
-      End Date is required.
-    </div>
-  </div>
+  updateLeaveBalance() {
+    const type = this.formData.leaveType;
+    this.leaveBalance = type ? `${this.leaveTypes[type]} days remaining` : '';
+  }
 
-  <!-- Leave Reason -->
-  <div>
-    <label for="leaveReason">Reason for Leave</label>
-    <textarea 
-      id="leaveReason" 
-      name="leaveReason" 
-      [(ngModel)]="formData.leaveReason" 
-      required 
-      #leaveReason="ngModel"></textarea>
-    <div *ngIf="leaveReason.invalid && leaveReason.touched">
-      Reason for Leave is required.
-    </div>
-  </div>
+  calculateLeaveDuration() {
+    const start = new Date(this.formData.startDate);
+    const end = new Date(this.formData.endDate);
+    const duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24) + 1;
 
-  <!-- Leave Balance -->
-  <div>
-    <label for="leaveBalance">Available Leave Balance</label>
-    <input id="leaveBalance" type="text" [value]="leaveBalance" readonly />
-  </div>
+    if (duration <= 0) {
+      this.leaveApprovalStatus = 'Invalid date range.';
+      return;
+    }
 
-  <!-- Leave Approval Status -->
-  <div>
-    <label for="leaveApproval">Leave Approval Status</label>
-    <input id="leaveApproval" type="text" [value]="leaveApprovalStatus" readonly />
-  </div>
+    if (this.leaveTypes[this.formData.leaveType] < duration) {
+      this.leaveApprovalStatus = `Insufficient ${this.formData.leaveType} balance.`;
+    } else {
+      this.leaveApprovalStatus = `Leave approved for ${duration} days.`;
+    }
+  }
 
-  <!-- Submit Button -->
-  <button type="submit" [disabled]="leaveForm.invalid">Submit Leave Application</button>
-</form>
+  onSubmit(form: any) {
+    if (form.valid) {
+      console.log('Leave application submitted:', this.formData);
+      alert('Leave application submitted successfully!');
+    }
+  }
+}
