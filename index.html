@@ -1,11 +1,9 @@
- Create a signup component that contains fields for Name, Address, and PanNumber, and interpolates these pieces of information into a paragraph.
+Create a student Model interface with field( ID,Name,Age,Average,grade,Active ) StudentList Component will create an array of student type.Display an array with NGFor in table. Grade wise color should be given using ngSwitch and ngClass or ngStyle. Only active should displayed using ngIf.
 
-   Name Input: Control ID -> #name-input
-   Address Input: Control ID -> #address-input
-   PanNumber Input: Control ID -> #pan-input
-   Submit Button: Control ID -> #submit-btn
-   Displayed Information Output: Control ID -> #displayed-info -> Default value -> ""
+Student Table: control ID -> #student-table
 
-   *The displayed information should be updated after clicking the Submit button, showing the entered values for Name, Address, and PanNumber in the paragraph.
-
-Example: If the user enters "John Doe" for Name, "123 Main St" for Address, and "ABCDE1234F" for PanNumber and clicks Submit, the displayed information should be "Name: John Doe, Address: 123 Main St, PanNumber: ABCDE1234F".
+* Use Below json 
+students=[
+   { ID: 1, Name: 'John', Age: 20, Average: 85, Grade: 'A', Active: true },
+   { ID: 2, Name: 'Alice', Age: 22, Average: 75, Grade: 'B', Active: false }
+ ];
