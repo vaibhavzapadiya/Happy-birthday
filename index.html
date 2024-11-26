@@ -1,33 +1,120 @@
-<table id="student-table" border="1" style="width: 100%; text-align: left;">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Age</th>
-      <th>Average</th>
-      <th>Grade</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr
-      *ngFor="let student of students"
-      *ngIf="student.Active"
-      [ngClass]="{
-        'grade-a': student.Grade === 'A',
-        'grade-b': student.Grade === 'B'
-      }"
-    >
-      <td>{{ student.ID }}</td>
-      <td>{{ student.Name }}</td>
-      <td>{{ student.Age }}</td>
-      <td>{{ student.Average }}</td>
-      <td [ngSwitch]="student.Grade">
-        <span *ngSwitchCase="'A'">A</span>
-        <span *ngSwitchCase="'B'">B</span>
-        <span *ngSwitchDefault>Other</span>
-      </td>
-      <td>{{ student.Active ? 'Active' : 'Inactive' }}</td>
-    </tr>
-  </tbody>
-</table>
+Domain: HR Recruitment
+Scenario: An Employee Leave Management System where employees can apply for leave. The system will allow employees to select the type of leave, dates of leave, and provide a reason for the leave. Based on the selected leave type, the system will calculate whether it is a paid or unpaid leave and display the appropriate message in real time. It will also show the available leave balance for each leave type.
+UI Control IDs:
+Employee Name Input
+
+Control ID: employeeName
+Type: text
+Label: Employee Name
+Required: Yes
+Leave Type Dropdown
+
+Control ID: leaveType
+Type: select
+Options: Paid Leave, Sick Leave, Casual Leave
+Label: Leave Type
+Required: Yes
+Leave Start Date
+
+Control ID: startDate
+Type: date
+Label: Start Date
+Required: Yes
+Leave End Date
+
+Control ID: endDate
+Type: date
+Label: End Date
+Required: Yes
+Leave Reason Input
+
+Control ID: leaveReason
+Type: textarea
+Label: Reason for Leave
+Required: Yes
+Leave Balance Display
+
+Control ID: leaveBalance
+Type: text
+Label: Available Leave Balance
+Read-Only: Yes
+Leave Approval Status
+
+Control ID: leaveApproval
+Type: text
+Label: Leave Approval Status
+Read-Only: Yes
+Submit Leave Application Button
+
+Control ID: submitLeave
+Type: button
+Label: Submit Leave Application
+Action: Submit leave application
+Functional Flow:
+Employee enters their name:
+
+Employee types their name into the employeeName input field.
+This will automatically store the employee's name in the system.
+Selects Leave Type:
+
+Employee selects the type of leave from the Leave Type Dropdown (leaveType).
+The available options are Paid Leave, Sick Leave, and Casual Leave.
+Each leave type will have different leave balance and approval criteria.
+Leave Dates:
+
+The employee selects start date and end date of the leave using the date pickers (startDate, endDate).
+The system calculates the duration of leave in days based on the difference between the selected start and end dates.
+Enter Leave Reason:
+
+Employee provides the reason for leave in the leaveReason textarea.
+This will be used to evaluate whether the leave is approved and for record-keeping purposes.
+Check Leave Balance:
+
+Once the employee selects the leave type, the system will display the leave balance for that type in the Leave Balance Display (leaveBalance).
+For example:
+Paid Leave: 12 days remaining
+Sick Leave: 8 days remaining
+Casual Leave: 5 days remaining
+The system will validate if the requested leave duration is within the employee’s available leave balance. If the leave balance is insufficient, an alert is shown.
+Approval Status:
+
+Based on the leave type and duration, the system will calculate whether the leave is approved or rejected:
+Paid Leave: Can be applied for up to 12 days in a year.
+Sick Leave: May require a doctor's note for approval.
+Casual Leave: Requires manager approval.
+The Leave Approval Status (leaveApproval) is updated in real time based on the employee’s inputs and the available leave balance.
+Submit Leave Application:
+
+When the employee is ready to submit the leave application, they click the Submit Leave Application button (submitLeave).
+The system validates the form, ensuring all fields are filled correctly, and processes the leave request based on availability and approval rules.
+If the leave is approved, a confirmation message is shown; if not, the employee is prompted to correct the details or try again later.
+Leave Application Confirmation:
+
+Once the leave application is successfully submitted, the Leave Approval Status (leaveApproval) updates with a message like “Leave approved” or “Leave pending approval” based on the internal logic.
+Business Logic:
+Leave Type Logic:
+
+Paid Leave: The employee can take paid leave from the available balance. If the requested days exceed the balance, the system will not allow submission and display a message stating “Insufficient Paid Leave Balance.”
+Sick Leave: Sick leave may require documentation (doctor’s note). If the employee selects Sick Leave, the system will show a field for uploading documents.
+Casual Leave: Casual leave requires manager approval. The system will display a message “Pending Manager Approval” once the leave is requested.
+Leave Duration Calculation:
+
+The system calculates the number of days requested based on the difference between startDate and endDate. If the start date is after the end date, an error message will appear.
+Leave Balance:
+
+The system retrieves and displays the remaining leave balance based on the employee’s leave type. It deducts the requested leave days after approval.
+Approval Flow:
+
+For Sick Leave and Casual Leave, additional steps are added to request manager approval or upload supporting documentation.
+For Paid Leave, it automatically checks the leave balance and allows submission if sufficient days are available.
+Expected User Flow:
+The employee fills in the necessary details in the leave form, including their name, leave type, start and end dates, and leave reason.
+The system calculates the leave duration and displays the leave balance for the selected leave type.
+The system checks if the employee has sufficient leave balance and approves or rejects the application based on the type of leave and duration.
+The employee submits the leave application.
+The employee receives an immediate notification on the leave approval status.
+Time Estimate:
+UI Design and Layout: 1-1.5 hours for setting up the form, labels, and controls.
+Business Logic Implementation: 1 hour for implementing the leave validation, approval flow, and balance calculations.
+Testing and Debugging: 30-45 minutes for ensuring the correct flow and handling errors gracefully.
+This use case covers a real-world scenario in HR Recruitment where an employee applies for leave, and the system ensures that business logic is followed for leave approval, balance calculation, and user interaction. It leverages Angular's two-way binding, built-in directives, and real-time validation for a smooth user experience.
