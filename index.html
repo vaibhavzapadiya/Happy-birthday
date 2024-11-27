@@ -1,29 +1,49 @@
-Objective: Create a form for adding and editing employee records with full CRUD functionality.
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
-Question:
-You are building a simple Employee Management system. The system should allow you to:
+@Component({
+  selector: 'app-add-employee',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './add-employee.component.html',
+  styleUrl: './add-employee.component.css'
+})
+export class AddEmployeeComponent {
 
-Add Employee: Use a Reactive Form to add new employees (name, email, department).
-Edit Employee: When an employee record is clicked, the form should be populated with the selected employee's details using patchValue.
-Delete Employee: Remove an employee from the list.
-Display Employees: Show the list of employees in a tabular format.
-Your task is to:
-Create the Reactive Form with the following fields:
-Name (employeeName)
-Email (employeeEmail)
-Department (employeeDepartment)
-Use patchValue to populate the form when editing an employee.
-Implement the logic to add, edit, and delete employee records.
-Display the list of employees in a table format with columns: Name, Email, Department, Actions (Edit, Delete).
-UI Control IDs:
+  addform: FormGroup;
+  errmsg: string = ''
+  employees: any[] = [];
+  editmode = false;
+  editindex: number | null = null;
+  constructor(private fb: FormBuilder) {
+    this.addform = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', Validators.required],
+      department: ['', Validators.required]
 
-Form Inputs:
-Name: employeeName
-Email: employeeEmail
-Department: employeeDepartment
-Table Columns:
-Name: employeeNameColumn
-Email: employeeEmailColumn
-Department: employeeDepartmentColumn
-Edit Button: editEmployeeButton
-Delete Button: deleteEmployeeButton
+    });
+  }
+  onSubmit() {
+
+    if (this.addform.valid) {
+      this.employees.push(this.addform.value)
+    }
+
+
+
+
+
+  }
+
+  editemployee(index: number) {
+    this.editmode = true
+    this.editindex = index
+    this.addform.patchValue(this.employees[index])
+
+  }
+  deleteemployee(index: number) {
+    this.employees.splice(index, 1)
+  }
+
+}
