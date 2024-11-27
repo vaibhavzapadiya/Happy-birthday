@@ -7,43 +7,62 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './add-employee.component.html',
-  styleUrl: './add-employee.component.css'
+  styleUrls: ['./add-employee.component.css'], // Note the correct plural 'styleUrls'
 })
 export class AddEmployeeComponent {
-
   addform: FormGroup;
-  errmsg: string = ''
+  errmsg: string = '';
   employees: any[] = [];
   editmode = false;
   editindex: number | null = null;
+
   constructor(private fb: FormBuilder) {
     this.addform = this.fb.group({
       name: ['', Validators.required],
-      email: ['', Validators.required],
-      department: ['', Validators.required]
-
+      email: ['', [Validators.required, Validators.email]], // Email validation
+      department: ['', Validators.required],
     });
   }
+
   onSubmit() {
-
     if (this.addform.valid) {
-      this.employees.push(this.addform.value)
+      if (this.editmode && this.editindex !== null) {
+        // Update existing employee
+        this.employees[this.editindex] = this.addform.value;
+        this.editmode = false;
+        this.editindex = null;
+      } else {
+        // Add new employee
+        this.employees.push(this.addform.value);
+      }
+
+      // Clear form after submission
+      this.addform.reset();
+    } else {
+      this.errmsg = 'Please fill in all required fields.';
     }
-
-
-
-
-
   }
 
   editemployee(index: number) {
-    this.editmode = true
-    this.editindex = index
-    this.addform.patchValue(this.employees[index])
-
+    this.editmode = true;
+    this.editindex = index;
+    this.addform.patchValue(this.employees[index]);
   }
+
   deleteemployee(index: number) {
-    this.employees.splice(index, 1)
+    this.employees.splice(index, 1);
+
+    // Reset edit mode if the deleted employee is being edited
+    if (this.editindex === index) {
+      this.editmode = false;
+      this.editindex = null;
+      this.addform.reset();
+    }
   }
 
+  cancelEdit() {
+    this.editmode = false;
+    this.editindex = null;
+    this.addform.reset();
+  }
 }
