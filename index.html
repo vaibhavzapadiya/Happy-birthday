@@ -1,20 +1,29 @@
-Business Logic:
-The user can add multiple phone numbers.
-At least one phone number must be entered, and it must be a valid 10-digit number.
-Each phone number should be validated as the user types.
-Functional Flow:
-The user can click the "Add Phone Number" button to add a new phone number field.
-The "Remove" button should remove the corresponding phone number.
-Validation should trigger for each phone number when the user tries to submit the form.
-UI and Control IDs:
-Label: Contact Phone Numbers
-Field ID: phone-array
-Input ID: phone-input-{i} (where {i} is the dynamic index)
-Error Message: "Phone number must be 10 digits"
-Error Control ID: phone-error-{i}
-Add Button ID: add-phone-button
-Remove Button ID: remove-phone-button-{i}
-Submit Button ID: submit-button
-Validation:
-Rule: At least one phone number is required.
-Pattern: Only 10-digit numeric values are allowed.
+Objective: Create a form for adding and editing employee records with full CRUD functionality.
+
+Question:
+You are building a simple Employee Management system. The system should allow you to:
+
+Add Employee: Use a Reactive Form to add new employees (name, email, department).
+Edit Employee: When an employee record is clicked, the form should be populated with the selected employee's details using patchValue.
+Delete Employee: Remove an employee from the list.
+Display Employees: Show the list of employees in a tabular format.
+Your task is to:
+Create the Reactive Form with the following fields:
+Name (employeeName)
+Email (employeeEmail)
+Department (employeeDepartment)
+Use patchValue to populate the form when editing an employee.
+Implement the logic to add, edit, and delete employee records.
+Display the list of employees in a table format with columns: Name, Email, Department, Actions (Edit, Delete).
+UI Control IDs:
+
+Form Inputs:
+Name: employeeName
+Email: employeeEmail
+Department: employeeDepartment
+Table Columns:
+Name: employeeNameColumn
+Email: employeeEmailColumn
+Department: employeeDepartmentColumn
+Edit Button: editEmployeeButton
+Delete Button: deleteEmployeeButton
