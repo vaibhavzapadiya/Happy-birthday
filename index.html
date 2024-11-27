@@ -1,31 +1,4 @@
-<div>
-  <form [formGroup]="userForm" id="userForm" (ngSubmit)="onSubmit()">
-    <!-- First Name -->
-    <div>
-      <label for="firstName">First Name:</label>
-      <input id="firstName" formControlName="firstName" />
-    </div>
+Use Case: Implement a reactive form with an email field.
 
-    <!-- Email -->
-    <div>
-      <label for="email">Email:</label>
-      <input id="email" formControlName="email" />
-    </div>
-
-    <!-- Submit Button -->
-    <button id="submit" type="submit" [disabled]="!userForm.valid">Submit</button>
-  </form>
-
-  <!-- Patch Value Button -->
-  <button id="patch-value" (click)="patchEmail()">Patch Value</button>
-
-  <!-- User List -->
-  <div id="user-data">
-    <h3>User List</h3>
-    <ul>
-      <li *ngFor="let user of userData">
-        {{ user.firstName }} - {{ user.email }}
-      </li>
-    </ul>
-  </div>
-</div>
+Functional Flow: The email field should accept only valid email addresses.
+UI: Label: Email, Input ID: email-input, Error Message: Invalid email address, Error Control ID: email-error.
