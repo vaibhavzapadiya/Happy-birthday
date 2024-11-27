@@ -1,54 +1,12 @@
-import { Component } from '@angular/core';
+Create A Reactive Form and try to update partially some field using the patch value
 
-@Component({
-  selector: 'app-leave-application',
-  templateUrl: './leave-application.component.html',
-  styleUrls: ['./leave-application.component.css']
-})
-export class LeaveApplicationComponent {
-  // Form Data Model
-  formData = {
-    employeeName: '',
-    leaveType: '',
-    startDate: '',
-    endDate: '',
-    leaveReason: ''
-  };
+ User Form: control id-> #userForm
+ First Name: control id-> #firstName
+ Email:  control id-> #email
+ Submit button: control id-> #submit
+ Patch value button: control id-> #patch-value
+ User List: control id-> #user-data
+   
 
-  leaveBalance = ''; // Leave Balance Display
-  leaveApprovalStatus = ''; // Leave Approval Status Display
-  leaveTypes = {
-    'Paid Leave': 12,
-    'Sick Leave': 8,
-    'Casual Leave': 5
-  };
 
-  updateLeaveBalance() {
-    const type = this.formData.leaveType;
-    this.leaveBalance = type ? `${this.leaveTypes[type]} days remaining` : '';
-  }
-
-  calculateLeaveDuration() {
-    const start = new Date(this.formData.startDate);
-    const end = new Date(this.formData.endDate);
-    const duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24) + 1;
-
-    if (duration <= 0) {
-      this.leaveApprovalStatus = 'Invalid date range.';
-      return;
-    }
-
-    if (this.leaveTypes[this.formData.leaveType] < duration) {
-      this.leaveApprovalStatus = `Insufficient ${this.formData.leaveType} balance.`;
-    } else {
-      this.leaveApprovalStatus = `Leave approved for ${duration} days.`;
-    }
-  }
-
-  onSubmit(form: any) {
-    if (form.valid) {
-      console.log('Leave application submitted:', this.formData);
-      alert('Leave application submitted successfully!');
-    }
-  }
-}
+   *Patch value should be = "updatedemail@gmail.com"
