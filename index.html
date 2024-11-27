@@ -1,4 +1,20 @@
-Use Case: Add a required full name field with a minimum of 3 characters.
+<form [formGroup]="fullnameForm" (ngSubmit)="onSubmit()">
+  <!-- Full Name Field -->
+  <label for="fullname-input">Full Name</label>
+  <input
+    type="text"
+    id="fullname-input"
+    formControlName="fullName"
+  />
+  
+  <!-- Error Message -->
+  <div id="fullname-error" *ngIf="fullName?.invalid && (fullName?.touched || fullName?.dirty)">
+    <span *ngIf="fullName?.errors?.required">Full name is required.</span>
+    <span *ngIf="fullName?.errors?.minlength">
+      Full name must be at least 3 characters.
+    </span>
+  </div>
 
-Functional Flow: Display an error when the input is empty or less than 3 characters.
-UI: Label: Full Name, Input ID: fullname-input, Error Message: Full name must be at least 3 characters, Error Control ID: fullname-error.
+  <!-- Submit Button -->
+  <button type="submit" [disabled]="fullnameForm.invalid">Submit</button>
+</form>
