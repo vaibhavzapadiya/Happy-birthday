@@ -1,20 +1,32 @@
-<form [formGroup]="fullnameForm" (ngSubmit)="onSubmit()">
-  <!-- Full Name Field -->
-  <label for="fullname-input">Full Name</label>
-  <input
-    type="text"
-    id="fullname-input"
-    formControlName="fullName"
-  />
-  
-  <!-- Error Message -->
-  <div id="fullname-error" *ngIf="fullName?.invalid && (fullName?.touched || fullName?.dirty)">
-    <span *ngIf="fullName?.errors?.required">Full name is required.</span>
-    <span *ngIf="fullName?.errors?.minlength">
-      Full name must be at least 3 characters.
-    </span>
-  </div>
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-  <!-- Submit Button -->
-  <button type="submit" [disabled]="fullnameForm.invalid">Submit</button>
-</form>
+@Component({
+  selector: 'app-fullname-form',
+  templateUrl: './fullname-form.component.html',
+  styleUrls: ['./fullname-form.component.css']
+})
+export class FullnameFormComponent implements OnInit {
+  fullnameForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.fullnameForm = this.fb.group({
+      fullName: [
+        '',
+        [Validators.required, Validators.minLength(3)]
+      ]
+    });
+  }
+
+  ngOnInit(): void {}
+
+  get fullName() {
+    return this.fullnameForm.get('fullName');
+  }
+
+  onSubmit() {
+    if (this.fullnameForm.valid) {
+      console.log('Form Submitted:', this.fullnameForm.value);
+    }
+  }
+}
