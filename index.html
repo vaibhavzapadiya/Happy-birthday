@@ -1,34 +1,16 @@
-<form [formGroup]="fullnameForm" (ngSubmit)="onSubmit()">
-  <!-- Full Name Field -->
-  <label for="fullname-input">Full Name</label>
+<form [formGroup]="phoneForm" (ngSubmit)="onPhoneSubmit()">
+  <label for="phone-input">Phone Number</label>
   <input
     type="text"
-    id="fullname-input"
-    formControlName="fullName"
+    id="phone-input"
+    formControlName="phoneNumber"
   />
-  
+
   <!-- Error Message -->
-  <div id="fullname-error" *ngIf="fullName?.invalid && (fullName?.touched || fullName?.dirty)">
-    <span *ngIf="fullName?.errors?.required">Full name is required.</span>
-    <span *ngIf="fullName?.errors?.minlength">
-      Full name must be at least 3 characters.
-    </span>
+  <div id="phone-error" *ngIf="phoneNumber?.invalid && (phoneNumber?.touched || phoneNumber?.dirty)">
+    <span *ngIf="phoneNumber?.errors?.required">Please enter a phone number.</span>
+    <span *ngIf="phoneNumber?.errors?.pattern">Phone number must be 10 digits.</span>
   </div>
 
-  <!-- Submit Button -->
-  <button type="submit" [disabled]="fullnameForm.invalid">Submit</button>
-</form><form [formGroup]="myForm" (ngSubmit)="onSubmit()">
-
-    <label for="phone-input">phone-input</label>
-    <input type="text" id="phone-input" formControlName="phonenum">
-
-    <div id="phone-error" *ngIf="mob.['phonenum'].touched && mob.['phonenum'].invalid">
-        <div *ngIf="mob.['phonenum'].errors?.['required']">Please enter mobile number</div>
-        <div *ngIf="mob.['phonenum'].errors?.['pattern']">Phone number must be 10 digits</div>
-        
-        
-        </div>
-
-
-    <button type="submit">submit</button>
+  <button type="submit" [disabled]="phoneForm.invalid">Submit</button>
 </form>
