@@ -1,12 +1,31 @@
-Create A Reactive Form and try to update partially some field using the patch value
+<div>
+  <form [formGroup]="userForm" id="userForm" (ngSubmit)="onSubmit()">
+    <!-- First Name -->
+    <div>
+      <label for="firstName">First Name:</label>
+      <input id="firstName" formControlName="firstName" />
+    </div>
 
- User Form: control id-> #userForm
- First Name: control id-> #firstName
- Email:  control id-> #email
- Submit button: control id-> #submit
- Patch value button: control id-> #patch-value
- User List: control id-> #user-data
-   
+    <!-- Email -->
+    <div>
+      <label for="email">Email:</label>
+      <input id="email" formControlName="email" />
+    </div>
 
+    <!-- Submit Button -->
+    <button id="submit" type="submit" [disabled]="!userForm.valid">Submit</button>
+  </form>
 
-   *Patch value should be = "updatedemail@gmail.com"
+  <!-- Patch Value Button -->
+  <button id="patch-value" (click)="patchEmail()">Patch Value</button>
+
+  <!-- User List -->
+  <div id="user-data">
+    <h3>User List</h3>
+    <ul>
+      <li *ngFor="let user of userData">
+        {{ user.firstName }} - {{ user.email }}
+      </li>
+    </ul>
+  </div>
+</div>
