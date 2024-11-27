@@ -1,16 +1,20 @@
-<form [formGroup]="phoneForm" (ngSubmit)="onPhoneSubmit()">
-  <label for="phone-input">Phone Number</label>
-  <input
-    type="text"
-    id="phone-input"
-    formControlName="phoneNumber"
-  />
-
-  <!-- Error Message -->
-  <div id="phone-error" *ngIf="phoneNumber?.invalid && (phoneNumber?.touched || phoneNumber?.dirty)">
-    <span *ngIf="phoneNumber?.errors?.required">Please enter a phone number.</span>
-    <span *ngIf="phoneNumber?.errors?.pattern">Phone number must be 10 digits.</span>
-  </div>
-
-  <button type="submit" [disabled]="phoneForm.invalid">Submit</button>
-</form>
+Business Logic:
+The user can add multiple phone numbers.
+At least one phone number must be entered, and it must be a valid 10-digit number.
+Each phone number should be validated as the user types.
+Functional Flow:
+The user can click the "Add Phone Number" button to add a new phone number field.
+The "Remove" button should remove the corresponding phone number.
+Validation should trigger for each phone number when the user tries to submit the form.
+UI and Control IDs:
+Label: Contact Phone Numbers
+Field ID: phone-array
+Input ID: phone-input-{i} (where {i} is the dynamic index)
+Error Message: "Phone number must be 10 digits"
+Error Control ID: phone-error-{i}
+Add Button ID: add-phone-button
+Remove Button ID: remove-phone-button-{i}
+Submit Button ID: submit-button
+Validation:
+Rule: At least one phone number is required.
+Pattern: Only 10-digit numeric values are allowed.
