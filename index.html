@@ -1,66 +1,70 @@
+
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
-    selector: 'app-employee',
-    templateUrl: './employee.component.html',
-    styleUrls: ['./employee.component.css'],
+  selector: 'app-add-employee',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './add-employee.component.html',
+  styleUrls: ['./add-employee.component.css'], // Note the correct plural 'styleUrls'
 })
-export class EmployeeComponent {
-    addform = this.fb.group({
-        name: [''],
-        email: [''],
-        department: [''],
+export class AddEmployeeComponent {
+  addform: FormGroup;
+  errmsg: string = '';
+  employees: any[] = [];
+  editmode = false;
+  editindex: number | null = null;
+
+  constructor(private fb: FormBuilder) {
+    this.addform = this.fb.group({
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]], // Email validation
+      department: ['', Validators.required],
     });
+  }
 
-    employees = [];
-    editmode = false;
-    errmsg = '';
-    selectedIndex = -1;
-
-    constructor(private fb: FormBuilder) {}
-
-    onSubmit() {
-        if (this.addform.valid) {
-            if (this.editmode) {
-                this.employees[this.selectedIndex] = this.addform.value;
-                this.editmode = false;
-            } else {
-                this.employees.push(this.addform.value);
-            }
-            this.addform.reset();
-        } else {
-            this.errmsg = 'Please fill all fields correctly.';
-        }
-    }
-
-    editemployee(index: number) {
-        this.selectedIndex = index;
-        this.addform.setValue(this.employees[index]);
-        this.editmode = true;
-        const modal = new bootstrap.Modal('#editModal');
-        modal.show();
-    }
-
-    updateEmployee() {
-        this.employees[this.selectedIndex] = this.addform.value;
-        const modal = bootstrap.Modal.getInstance('#editModal');
-        modal.hide();
-    }
-
-    openDeleteModal(index: number) {
-        this.selectedIndex = index;
-        const modal = new bootstrap.Modal('#deleteModal');
-        modal.show();
-    }
-
-    deleteemployee(index: number) {
-        this.employees.splice(index, 1);
-        const modal = bootstrap.Modal.getInstance('#deleteModal');
-        modal.hide();
-    }
-
-    cancelEdit() {
+  onSubmit() {
+    if (this.addform.valid) {
+      if (this.editmode && this.editindex !== null) {
+        // Update existing employee
+        this.employees[this.editindex] = this.addform.value;
         this.editmode = false;
-        this.addform.reset();
+        this.editindex = null;
+      } else {
+
+        this.employees.push(this.addform.value);
+      }
+
+
+      this.addform.reset();
+    } else {
+      this.errmsg = 'Please fill in all required fields.';
     }
+  }
+
+  editemployee(index: number) {
+    this.editmode = true;
+    this.editindex = index;
+    this.addform.patchValue(this.employees[index]);
+  }
+
+  deleteemployee(index: number) {
+    if (confirm("are you sure want to delete?") == true) {
+      this.employees.splice(index, 1);
+      this.addform.reset();
+    }
+   
+
+
+  
+
+  }
+
+  cancelEdit() {
+    this.editmode = false;
+    this.editindex = null;
+    this.addform.reset();
+  }
 }
