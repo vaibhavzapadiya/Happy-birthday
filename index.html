@@ -1,68 +1,65 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+<div class="form-group container">
+    <form [formGroup]="addform" (ngSubmit)="onSubmit()">
+        <div>
+            <label for="name">Name:</label>
+            <input id="name" formControlName="name" class="form-control" />
+            <div *ngIf="addform.get('name')?.invalid && addform.get('name')?.touched" class="text-danger">
+                Name is required.
+            </div>
+        </div>
 
-@Component({
-  selector: 'app-add-employee',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './add-employee.component.html',
-  styleUrls: ['./add-employee.component.css'], // Note the correct plural 'styleUrls'
-})
-export class AddEmployeeComponent {
-  addform: FormGroup;
-  errmsg: string = '';
-  employees: any[] = [];
-  editmode = false;
-  editindex: number | null = null;
+        <div>
+            <label for="email">Email:</label>
+            <input id="email" formControlName="email" type="email"  class="form-control"/>
+            <div *ngIf="addform.get('email')?.invalid && addform.get('email')?.touched" class="text-danger">
+                Valid email is required.
+            </div>
+        </div>
 
-  constructor(private fb: FormBuilder) {
-    this.addform = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]], // Email validation
-      department: ['', Validators.required],
-    });
-  }
+        <div>
 
-  onSubmit() {
-    if (this.addform.valid) {
-      if (this.editmode && this.editindex !== null) {
-        // Update existing employee
-        this.employees[this.editindex] = this.addform.value;
-        this.editmode = false;
-        this.editindex = null;
-      } else {
-        // Add new employee
-        this.employees.push(this.addform.value);
-      }
+            <select name="department" id="department" formControlName="department" class="form-control">
+                <option value="">select department</option>
+                <option value="Sales">Sales</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Tech">Tech</option>
+            </select>
+            
+            <div *ngIf="addform.get('department')?.invalid && addform.get('department')?.touched" class="text-danger">
+                Department is required.
+            </div>
+        </div>
 
-      // Clear form after submission
-      this.addform.reset();
-    } else {
-      this.errmsg = 'Please fill in all required fields.';
-    }
-  }
+        <button type="submit"  class="btn btn-primary">{{ editmode ? 'Update ' : 'Add ' }}</button>
+        <button type="button" *ngIf="editmode" (click)="cancelEdit()" class="btn btn-warning">Cancel Edit</button>
+    </form>
 
-  editemployee(index: number) {
-    this.editmode = true;
-    this.editindex = index;
-    this.addform.patchValue(this.employees[index]);
-  }
+    <div *ngIf="errmsg" class="error text-danger" >{{ errmsg }}</div>
 
-  deleteemployee(index: number) {
-    this.employees.splice(index, 1);
+ 
+ 
+</div>
 
-    // Reset edit mode if the deleted employee is being edited
-    if (this.editindex === index) {
-      this.editmode = false;
-      this.editindex = null;
-      this.addform.reset();
-    }
-  }
-
-  cancelEdit() {
-    this.editmode = false;
-    this.editindex = null;
-    this.addform.reset();
-  }
-}
+<div  class="container" id="diplayrecord">
+    <h3>Employee List</h3>
+<div >
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody *ngFor="let employee of employees; let i = index">
+            <tr>
+                <th> {{ employee.name }}</th>
+                <th>{{ employee.email }}</th>
+                <th>{{ employee.department }}</th>
+                <th>   <button (click)="editemployee(i)"  class="btn btn-primary">Edit</button>     <button (click)="deleteemployee(i)" class="btn btn-danger">Delete</button></th>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</div>
