@@ -1,65 +1,66 @@
-<div class="form-group container">
-    <form [formGroup]="addform" (ngSubmit)="onSubmit()">
-        <div>
-            <label for="name">Name:</label>
-            <input id="name" formControlName="name" class="form-control" />
-            <div *ngIf="addform.get('name')?.invalid && addform.get('name')?.touched" class="text-danger">
-                Name is required.
-            </div>
-        </div>
+import { Component } from '@angular/core';
 
-        <div>
-            <label for="email">Email:</label>
-            <input id="email" formControlName="email" type="email"  class="form-control"/>
-            <div *ngIf="addform.get('email')?.invalid && addform.get('email')?.touched" class="text-danger">
-                Valid email is required.
-            </div>
-        </div>
+@Component({
+    selector: 'app-employee',
+    templateUrl: './employee.component.html',
+    styleUrls: ['./employee.component.css'],
+})
+export class EmployeeComponent {
+    addform = this.fb.group({
+        name: [''],
+        email: [''],
+        department: [''],
+    });
 
-        <div>
+    employees = [];
+    editmode = false;
+    errmsg = '';
+    selectedIndex = -1;
 
-            <select name="department" id="department" formControlName="department" class="form-control">
-                <option value="">select department</option>
-                <option value="Sales">Sales</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Tech">Tech</option>
-            </select>
-            
-            <div *ngIf="addform.get('department')?.invalid && addform.get('department')?.touched" class="text-danger">
-                Department is required.
-            </div>
-        </div>
+    constructor(private fb: FormBuilder) {}
 
-        <button type="submit"  class="btn btn-primary">{{ editmode ? 'Update ' : 'Add ' }}</button>
-        <button type="button" *ngIf="editmode" (click)="cancelEdit()" class="btn btn-warning">Cancel Edit</button>
-    </form>
+    onSubmit() {
+        if (this.addform.valid) {
+            if (this.editmode) {
+                this.employees[this.selectedIndex] = this.addform.value;
+                this.editmode = false;
+            } else {
+                this.employees.push(this.addform.value);
+            }
+            this.addform.reset();
+        } else {
+            this.errmsg = 'Please fill all fields correctly.';
+        }
+    }
 
-    <div *ngIf="errmsg" class="error text-danger" >{{ errmsg }}</div>
+    editemployee(index: number) {
+        this.selectedIndex = index;
+        this.addform.setValue(this.employees[index]);
+        this.editmode = true;
+        const modal = new bootstrap.Modal('#editModal');
+        modal.show();
+    }
 
- 
- 
-</div>
+    updateEmployee() {
+        this.employees[this.selectedIndex] = this.addform.value;
+        const modal = bootstrap.Modal.getInstance('#editModal');
+        modal.hide();
+    }
 
-<div  class="container" id="diplayrecord">
-    <h3>Employee List</h3>
-<div >
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody *ngFor="let employee of employees; let i = index">
-            <tr>
-                <th> {{ employee.name }}</th>
-                <th>{{ employee.email }}</th>
-                <th>{{ employee.department }}</th>
-                <th>   <button (click)="editemployee(i)"  class="btn btn-primary">Edit</button>     <button (click)="deleteemployee(i)" class="btn btn-danger">Delete</button></th>
-            </tr>
-        </tbody>
-    </table>
-</div>
-</div>
+    openDeleteModal(index: number) {
+        this.selectedIndex = index;
+        const modal = new bootstrap.Modal('#deleteModal');
+        modal.show();
+    }
+
+    deleteemployee(index: number) {
+        this.employees.splice(index, 1);
+        const modal = bootstrap.Modal.getInstance('#deleteModal');
+        modal.hide();
+    }
+
+    cancelEdit() {
+        this.editmode = false;
+        this.addform.reset();
+    }
+}
