@@ -1,4 +1,3 @@
-
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,7 +7,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './add-employee.component.html',
-  styleUrls: ['./add-employee.component.css'], // Note the correct plural 'styleUrls'
+  styleUrls: ['./add-employee.component.css']
 })
 export class AddEmployeeComponent {
   addform: FormGroup;
@@ -20,8 +19,8 @@ export class AddEmployeeComponent {
   constructor(private fb: FormBuilder) {
     this.addform = this.fb.group({
       name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]], // Email validation
-      department: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      department: ['', Validators.required]
     });
   }
 
@@ -33,11 +32,9 @@ export class AddEmployeeComponent {
         this.editmode = false;
         this.editindex = null;
       } else {
-
+        // Add new employee
         this.employees.push(this.addform.value);
       }
-
-
       this.addform.reset();
     } else {
       this.errmsg = 'Please fill in all required fields.';
@@ -51,15 +48,10 @@ export class AddEmployeeComponent {
   }
 
   deleteemployee(index: number) {
-    if (confirm("are you sure want to delete?") == true) {
+    if (confirm("Are you sure you want to delete?")) {
       this.employees.splice(index, 1);
       this.addform.reset();
     }
-   
-
-
-  
-
   }
 
   cancelEdit() {
