@@ -1,29 +1,21 @@
-Objective: Implement a product management system where users can add, edit, and delete products.
+<form [formGroup]="passwordform">
+    <label for="password-input">Password</label>
+    <input type="text" id="password-input" formControlName="password" />
 
-Question:
-You need to implement a Product Management system where users can:
+    <label for="confirm-password-input">Confirm Password</label>
+    <input type="text" id="confirm-password-input" formControlName="confirmpassword" />
 
-Add a new product with name, price, description.
-Edit a product's details by selecting it from the list, which will populate the form using patchValue.
-Delete a product from the list.
-Display products in a table.
-Your task is to:
-Build a form for adding products with the following fields:
-Product Name (productName)
-Price (productPrice)
-Description (productDescription)
-Use patchValue to pre-fill the form when editing a product.
-Implement add, edit, and delete actions for products.
-Display the list of products in a table with columns: Product Name, Price, Description, and Actions (Edit, Delete).
-UI Control IDs:
 
-Form Inputs:
-Product Name: productName
-Price: productPrice
-Description: productDescription
-Table Columns:
-Product Name: productNameColumn
-Price: productPriceColumn
-Description: productDescriptionColumn
-Edit Button: editProductButton
-Delete Button: deleteProductButton
+   
+</form>
+<div id="password-error." *ngIf="passwordform.get('password')?.invalid && (passwordform.get('password')?.touched || passwordform.get('password')?.dirty)">
+    <span *ngIf="passwordform.get('password')?.errors?.['required']">password required.</span>
+    <span *ngIf="passwordform.get('password')?.errors?.['pattern']">Password must contain at least 8 characters, a number, and a special character </span>
+</div>
+
+
+<div id="confirm-password-error" *ngIf="passwordform.get('confirmpassword')?.invalid && passwordform.get('confirmpassword')?.touched">
+    <span *ngIf="passwordform.get('confirmpassword')?.errors?.['required']">Confirm Password required</span>
+    <span *ngIf="passwordform.get('confirmpassword')!==passwordform.get('password')">Passwords do not match</span>
+
+</div>
