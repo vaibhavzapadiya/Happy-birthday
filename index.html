@@ -1,27 +1,21 @@
-<form [formGroup]="passwordform">
-  <label for="password-input">Password</label>
-  <input type="text" id="password-input" formControlName="password" />
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { passwordMatchValidator } from './path-to-validator';
 
-  <label for="confirm-password-input">Confirm Password</label>
-  <input type="text" id="confirm-password-input" formControlName="confirmpassword" />
-</form>
+@Component({
+  selector: 'app-password-form',
+  templateUrl: './password-form.component.html',
+})
+export class PasswordFormComponent {
+  passwordform: FormGroup;
 
-<!-- Password Errors -->
-<div id="password-error" 
-     *ngIf="passwordform.get('password')?.invalid && 
-           (passwordform.get('password')?.touched || passwordform.get('password')?.dirty)">
-  <span *ngIf="passwordform.get('password')?.errors?.['required']">Password required.</span>
-  <span *ngIf="passwordform.get('password')?.errors?.['pattern']">
-    Password must contain at least 8 characters, a number, and a special character.
-  </span>
-</div>
-
-<!-- Confirm Password Errors -->
-<div id="confirm-password-error" 
-     *ngIf="passwordform.get('confirmpassword')?.invalid && 
-           (passwordform.get('confirmpassword')?.touched || passwordform.get('confirmpassword')?.dirty)">
-  <span *ngIf="passwordform.get('confirmpassword')?.errors?.['required']">Confirm Password required.</span>
-  <span *ngIf="passwordform.get('confirmpassword')?.value !== passwordform.get('password')?.value">
-    Passwords do not match.
-  </span>
-</div>
+  constructor(private fb: FormBuilder) {
+    this.passwordform = this.fb.group(
+      {
+        password: ['', [Validators.required, Validators.pattern(/^(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)]],
+        confirmpassword: ['', Validators.required],
+      },
+      { validators: passwordMatchValidator() } // Apply the custom validator
+    );
+  }
+}
