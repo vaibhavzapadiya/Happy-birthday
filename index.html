@@ -1,21 +1,44 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { passwordMatchValidator } from './path-to-validator';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 
 @Component({
-  selector: 'app-password-form',
-  templateUrl: './password-form.component.html',
+  selector: 'app-username-form',
+  template: `
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <label for="username">Username:</label>
+      <input id="username" formControlName="username" />
+      <div *ngIf="username.errors?.containsAdmin && username.touched">
+        Username cannot contain the word "admin".
+      </div>
+      <button type="submit" [disabled]="form.invalid">Submit</button>
+    </form>
+  `,
 })
-export class PasswordFormComponent {
-  passwordform: FormGroup;
+export class UsernameFormComponent {
+  form: FormGroup;
 
   constructor(private fb: FormBuilder) {
-    this.passwordform = this.fb.group(
-      {
-        password: ['', [Validators.required, Validators.pattern(/^(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)]],
-        confirmpassword: ['', Validators.required],
-      },
-      { validators: passwordMatchValidator() } // Apply the custom validator
-    );
+    this.form = this.fb.group({
+      username: ['', [Validators.required, this.noAdminValidator]],
+    });
+  }
+
+  get username() {
+    return this.form.get('username');
+  }
+
+  // Custom Validator
+  noAdminValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    if (value && value.toLowerCase().includes('admin')) {
+      return { containsAdmin: true };
+    }
+    return null;
+  }
+
+  onSubmit() {
+    if (this.form.valid) {
+      console.log('Form Submitted:', this.form.value);
+    }
   }
 }
