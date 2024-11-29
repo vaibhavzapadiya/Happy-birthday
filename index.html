@@ -1,21 +1,27 @@
 <form [formGroup]="passwordform">
-    <label for="password-input">Password</label>
-    <input type="text" id="password-input" formControlName="password" />
+  <label for="password-input">Password</label>
+  <input type="text" id="password-input" formControlName="password" />
 
-    <label for="confirm-password-input">Confirm Password</label>
-    <input type="text" id="confirm-password-input" formControlName="confirmpassword" />
-
-
-   
+  <label for="confirm-password-input">Confirm Password</label>
+  <input type="text" id="confirm-password-input" formControlName="confirmpassword" />
 </form>
-<div id="password-error." *ngIf="passwordform.get('password')?.invalid && (passwordform.get('password')?.touched || passwordform.get('password')?.dirty)">
-    <span *ngIf="passwordform.get('password')?.errors?.['required']">password required.</span>
-    <span *ngIf="passwordform.get('password')?.errors?.['pattern']">Password must contain at least 8 characters, a number, and a special character </span>
+
+<!-- Password Errors -->
+<div id="password-error" 
+     *ngIf="passwordform.get('password')?.invalid && 
+           (passwordform.get('password')?.touched || passwordform.get('password')?.dirty)">
+  <span *ngIf="passwordform.get('password')?.errors?.['required']">Password required.</span>
+  <span *ngIf="passwordform.get('password')?.errors?.['pattern']">
+    Password must contain at least 8 characters, a number, and a special character.
+  </span>
 </div>
 
-
-<div id="confirm-password-error" *ngIf="passwordform.get('confirmpassword')?.invalid && passwordform.get('confirmpassword')?.touched">
-    <span *ngIf="passwordform.get('confirmpassword')?.errors?.['required']">Confirm Password required</span>
-    <span *ngIf="passwordform.get('confirmpassword')!==passwordform.get('password')">Passwords do not match</span>
-
+<!-- Confirm Password Errors -->
+<div id="confirm-password-error" 
+     *ngIf="passwordform.get('confirmpassword')?.invalid && 
+           (passwordform.get('confirmpassword')?.touched || passwordform.get('confirmpassword')?.dirty)">
+  <span *ngIf="passwordform.get('confirmpassword')?.errors?.['required']">Confirm Password required.</span>
+  <span *ngIf="passwordform.get('confirmpassword')?.value !== passwordform.get('password')?.value">
+    Passwords do not match.
+  </span>
 </div>
