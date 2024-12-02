@@ -1,4 +1,15 @@
-Use Case: Create an address form group with required fields (Street, City, ZIP).
-
-Functional Flow: Ensure all fields are validated as a group.
-UI: Inputs: street-input, city-input, zip-input, Error Message: All address fields are required, Error Control ID: address-error.
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div formArrayName="contactlist">
+    <div *ngFor="let contact of contactlist.controls; let i = index">
+      <label for="">Contact Phone Numbers</label>
+      <input type="text" id="phone-input-{{i}}" [formControlName]="i" /> 
+    <span *ngIf="this.contactlist.controls[i].touched && this.contactlist.controls[i].hasError('required')">field is required</span>
+      <button id="add-phone-button" (click)="addcontact()">Add Contact</button>
+      <button id="remove-phone-button-{{i}}" (click)="removecontact(i)">
+        Remove Contact
+      </button>
+    </div>
+ 
+  </div>
+  <input type="submit" id="submit-button" [disabled]="form.invalid" />
+</form>
