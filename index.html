@@ -2,14 +2,22 @@
   <div formArrayName="contactlist">
     <div *ngFor="let contact of contactlist.controls; let i = index">
       <label for="">Contact Phone Numbers</label>
-      <input type="text" id="phone-input-{{i}}" [formControlName]="i" /> 
-    <span *ngIf="this.contactlist.controls[i].touched && this.contactlist.controls[i].hasError('required')">field is required</span>
-      <button id="add-phone-button" (click)="addcontact()">Add Contact</button>
-      <button id="remove-phone-button-{{i}}" (click)="removecontact(i)">
+      <input type="text" id="phone-input-{{i}}" [formControlName]="i" />
+      <span
+        *ngIf="contactlist.controls[i].touched && contactlist.controls[i].hasError('required')"
+      >
+        Field is required
+      </span>
+      <button id="add-phone-button" type="button" (click)="addcontact()">Add Contact</button>
+      <button
+        *ngIf="contactlist.length > 1"
+        id="remove-phone-button-{{i}}"
+        type="button"
+        (click)="removecontact(i)"
+      >
         Remove Contact
       </button>
     </div>
- 
   </div>
   <input type="submit" id="submit-button" [disabled]="form.invalid" />
 </form>
