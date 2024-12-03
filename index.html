@@ -1,63 +1,153 @@
-import { Component, FormArray, FormBuilder, FormGroup, Validators } from '@angular/core';
+<form [formGroup]="studentForm" id="studentForm" (ngSubmit)="onSubmit()">
+  <h2>Student Information</h2>
+  <div>
+    <label for="firstName">First Name</label>
+    <input id="firstName" formControlName="firstName" />
+    <div class="error-message" *ngIf="studentForm.get('firstName')?.invalid && studentForm.get('firstName')?.touched">
+      First Name is required.
+    </div>
+  </div>
 
-@Component({
-  selector: 'app-student-admission-form',
-  templateUrl: './student-admission-form.component.html',
-  styleUrls: ['./student-admission-form.component.css'],
-})
-export class StudentAdmissionFormComponent {
-  studentForm: FormGroup;
+  <div>
+    <label for="middleName">Middle Name</label>
+    <input id="middleName" formControlName="middleName" />
+    <div class="error-message" *ngIf="studentForm.get('middleName')?.invalid && studentForm.get('middleName')?.touched">
+      Middle Name is required.
+    </div>
+  </div>
 
-  constructor(private fb: FormBuilder) {
-    this.studentForm = this.fb.group({
-      firstName: ['', Validators.required],
-      middleName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      dob: ['', Validators.required],
-      placeOfBirth: ['', Validators.required],
-      firstLanguage: ['', Validators.required],
-      city: ['', Validators.required],
-      state: ['', Validators.required],
-      country: ['', Validators.required],
-      pin: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
-      fatherFullName: ['', Validators.required],
-      fatherEmail: ['', [Validators.required, Validators.email]],
-      fatherEducation: ['', Validators.required],
-      fatherProfession: ['', Validators.required],
-      fatherDesignation: ['', Validators.required],
-      fatherPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      motherFullName: ['', Validators.required],
-      motherEmail: ['', [Validators.required, Validators.email]],
-      motherEducation: ['', Validators.required],
-      motherProfession: ['', Validators.required],
-      motherDesignation: ['', Validators.required],
-      motherPhone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      emergencyContacts: this.fb.array([]),
-    });
-  }
+  <div>
+    <label for="lastName">Last Name</label>
+    <input id="lastName" formControlName="lastName" />
+    <div class="error-message" *ngIf="studentForm.get('lastName')?.invalid && studentForm.get('lastName')?.touched">
+      Last Name is required.
+    </div>
+  </div>
 
-  get emergencyContacts() {
-    return this.studentForm.get('emergencyContacts') as FormArray;
-  }
+  <div>
+    <label for="dob">Date of Birth</label>
+    <input id="dob" type="date" formControlName="dob" />
+    <div class="error-message" *ngIf="studentForm.get('dob')?.invalid && studentForm.get('dob')?.touched">
+      Date of Birth is required.
+    </div>
+  </div>
 
-  addEmergencyContact() {
-    this.emergencyContacts.push(
-      this.fb.group({
-        relation: ['', Validators.required],
-        emergencyNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      })
-    );
-  }
+  <div>
+    <label for="placeOfBirth">Place of Birth</label>
+    <input id="placeOfBirth" formControlName="placeOfBirth" />
+    <div class="error-message" *ngIf="studentForm.get('placeOfBirth')?.invalid && studentForm.get('placeOfBirth')?.touched">
+      Place of Birth is required.
+    </div>
+  </div>
 
-  removeEmergencyContact(index: number) {
-    this.emergencyContacts.removeAt(index);
-  }
+  <div>
+    <label for="firstLanguage">First Language</label>
+    <input id="firstLanguage" formControlName="firstLanguage" />
+    <div class="error-message" *ngIf="studentForm.get('firstLanguage')?.invalid && studentForm.get('firstLanguage')?.touched">
+      First Language is required.
+    </div>
+  </div>
 
-  onSubmit() {
-    if (this.studentForm.valid) {
-      console.log('Form Data:', this.studentForm.value);
-    } else {
-      console.error('Form is invalid');
-    }
-  }
-}
+  <div>
+    <label for="city">City</label>
+    <input id="city" formControlName="city" />
+    <div class="error-message" *ngIf="studentForm.get('city')?.invalid && studentForm.get('city')?.touched">
+      City is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="state">State</label>
+    <input id="state" formControlName="state" />
+    <div class="error-message" *ngIf="studentForm.get('state')?.invalid && studentForm.get('state')?.touched">
+      State is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="country">Country</label>
+    <input id="country" formControlName="country" />
+    <div class="error-message" *ngIf="studentForm.get('country')?.invalid && studentForm.get('country')?.touched">
+      Country is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="pin">Pincode</label>
+    <input id="pin" formControlName="pin" />
+    <div class="error-message" *ngIf="studentForm.get('pin')?.invalid && studentForm.get('pin')?.touched">
+      Pincode is required and must be 6 digits.
+    </div>
+  </div>
+
+  <h2>Father Information</h2>
+  <div>
+    <label for="fatherFullName">Full Name</label>
+    <input id="fatherFullName" formControlName="fatherFullName" />
+    <div class="error-message" *ngIf="studentForm.get('fatherFullName')?.invalid && studentForm.get('fatherFullName')?.touched">
+      Father's Full Name is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="fatherEmail">Email</label>
+    <input id="fatherEmail" formControlName="fatherEmail" />
+    <div class="error-message" *ngIf="studentForm.get('fatherEmail')?.invalid && studentForm.get('fatherEmail')?.touched">
+      Email format is invalid.
+    </div>
+  </div>
+
+  <div>
+    <label for="fatherEducation">Education</label>
+    <input id="fatherEducation" formControlName="fatherEducation" />
+    <div class="error-message" *ngIf="studentForm.get('fatherEducation')?.invalid && studentForm.get('fatherEducation')?.touched">
+      Education is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="fatherProfession">Profession</label>
+    <input id="fatherProfession" formControlName="fatherProfession" />
+    <div class="error-message" *ngIf="studentForm.get('fatherProfession')?.invalid && studentForm.get('fatherProfession')?.touched">
+      Profession is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="fatherDesignation">Designation</label>
+    <input id="fatherDesignation" formControlName="fatherDesignation" />
+    <div class="error-message" *ngIf="studentForm.get('fatherDesignation')?.invalid && studentForm.get('fatherDesignation')?.touched">
+      Designation is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="fatherPhone">Phone Number</label>
+    <input id="fatherPhone" formControlName="fatherPhone" />
+    <div class="error-message" *ngIf="studentForm.get('fatherPhone')?.invalid && studentForm.get('fatherPhone')?.touched">
+      Phone number should be 10 digits.
+    </div>
+  </div>
+
+  <h2>Mother Information</h2>
+  <!-- Similar structure as Father Information -->
+
+  <h2>Emergency Contacts</h2>
+  <div formArrayName="emergencyContacts">
+    <div *ngFor="let contact of emergencyContacts.controls; let i = index" [formGroupName]="i">
+      <label for="{{ 'emergencyContact' + i }}">Relation</label>
+      <select [id]="'emergencyContact' + i" formControlName="relation">
+        <option value="Sibling">Sibling</option>
+        <option value="Uncle">Uncle</option>
+        <option value="Aunt">Aunt</option>
+        <option value="Grandparent">Grandparent</option>
+      </select>
+      <label for="{{ 'emergencyNumber' + i }}">Contact Number</label>
+      <input [id]="'emergencyNumber' + i" formControlName="emergencyNumber" />
+      <button type="button" (click)="removeEmergencyContact(i)">Remove</button>
+    </div>
+  </div>
+  <button id="add-emergencyContacts" type="button" (click)="addEmergencyContact()">Add More</button>
+
+  <button id="submit" type="submit" [disabled]="studentForm.invalid">Submit</button>
+</form>
