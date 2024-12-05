@@ -1,1 +1,21 @@
-Develop a directive that applies a green background if a boolean input property isValid is true, and red if false.
+import { Directive, Input, ElementRef, Renderer2, OnChanges, SimpleChanges } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective implements OnChanges {
+  @Input() isValid!: boolean; // Boolean input property
+
+  constructor(private el: ElementRef, private renderer: Renderer2) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('isValid' in changes) {
+      this.applyHighlight();
+    }
+  }
+
+  private applyHighlight(): void {
+    const backgroundColor = this.isValid ? 'green' : 'red';
+    this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', backgroundColor);
+  }
+}
