@@ -1,2 +1,22 @@
-Use case: A user updates their profile information using a form component.
-Question: Create a form component with two-way binding to allow users to update their profile details (e.g., name, email). Reflect the changes in the parent component when the form is submitted.
+<form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+  <div>
+    <label for="name">Name:</label>
+    <input 
+      id="name" 
+      name="name" 
+      [(ngModel)]="user.name" 
+      required />
+  </div>
+  
+  <div>
+    <label for="email">Email:</label>
+    <input 
+      id="email" 
+      name="email" 
+      [(ngModel)]="user.email" 
+      type="email" 
+      required />
+  </div>
+
+  <button type="submit" [disabled]="!profileForm.valid">Update</button>
+</form>
