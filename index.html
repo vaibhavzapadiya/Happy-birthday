@@ -1,10 +1,17 @@
-<div>
-  <h2>User Profile</h2>
-  <p><strong>Name:</strong> {{ user.name }}</p>
-  <p><strong>Email:</strong> {{ user.email }}</p>
-  
-  <app-profile-form 
-    [user]="user" 
-    (profileUpdated)="updateProfile($event)">
-  </app-profile-form>
-</div>
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  templateUrl: './parent.component.html',
+  styleUrls: ['./parent.component.css']
+})
+export class ParentComponent {
+  user = {
+    name: 'John Doe',
+    email: 'john.doe@example.com'
+  };
+
+  updateProfile(updatedUser: { name: string; email: string }) {
+    this.user = { ...updatedUser };
+  }
+}
