@@ -1,21 +1,2 @@
-import { Directive, Input, ElementRef, Renderer2, OnChanges, SimpleChanges } from '@angular/core';
-
-@Directive({
-  selector: '[appHighlight]'
-})
-export class HighlightDirective implements OnChanges {
-  @Input() isValid!: boolean; // Boolean input property
-
-  constructor(private el: ElementRef, private renderer: Renderer2) {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if ('isValid' in changes) {
-      this.applyHighlight();
-    }
-  }
-
-  private applyHighlight(): void {
-    const backgroundColor = this.isValid ? 'green' : 'red';
-    this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', backgroundColor);
-  }
-}
+Use case: A user updates their profile information using a form component.
+Question: Create a form component with two-way binding to allow users to update their profile details (e.g., name, email). Reflect the changes in the parent component when the form is submitted.
