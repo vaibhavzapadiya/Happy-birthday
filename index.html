@@ -1,28 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SharedService } from '../shared.service';
 
 @Component({
-  selector: 'app-product-selector',
+  selector: 'app-product-details',
   template: `
-    <h3>Select a Product</h3>
-    <ul>
-      <li *ngFor="let product of products" (click)="selectProduct(product)">
-        {{ product.name }}
-      </li>
-    </ul>
+    <h3>Product Details</h3>
+    <div *ngIf="selectedProduct">
+      <p><strong>Name:</strong> {{ selectedProduct.name }}</p>
+      <p><strong>Details:</strong> {{ selectedProduct.details }}</p>
+    </div>
+    <p *ngIf="!selectedProduct">No product selected.</p>
   `,
-  styles: ['li { cursor: pointer; }']
+  styles: []
 })
-export class ProductSelectorComponent {
-  products = [
-    { id: 1, name: 'Product A', details: 'Details of Product A' },
-    { id: 2, name: 'Product B', details: 'Details of Product B' },
-    { id: 3, name: 'Product C', details: 'Details of Product C' }
-  ];
+export class ProductDetailsComponent implements OnInit {
+  selectedProduct: any;
 
   constructor(private sharedService: SharedService) {}
 
-  selectProduct(product: any): void {
-    this.sharedService.setSelectedProduct(product);
+  ngOnInit(): void {
+    this.sharedService.selectedProduct$.subscribe(product => {
+      this.selectedProduct = product;
+    });
   }
 }
