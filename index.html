@@ -1,22 +1,15 @@
-<form (ngSubmit)="onSubmit()" #profileForm="ngForm">
-  <div>
-    <label for="name">Name:</label>
-    <input 
-      id="name" 
-      name="name" 
-      [(ngModel)]="user.name" 
-      required />
-  </div>
-  
-  <div>
-    <label for="email">Email:</label>
-    <input 
-      id="email" 
-      name="email" 
-      [(ngModel)]="user.email" 
-      type="email" 
-      required />
-  </div>
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-  <button type="submit" [disabled]="!profileForm.valid">Update</button>
-</form>
+@Component({
+  selector: 'app-profile-form',
+  templateUrl: './profile-form.component.html',
+  styleUrls: ['./profile-form.component.css']
+})
+export class ProfileFormComponent {
+  @Input() user!: { name: string; email: string }; // Input property to get user details
+  @Output() profileUpdated = new EventEmitter<{ name: string; email: string }>();
+
+  onSubmit() {
+    this.profileUpdated.emit(this.user); // Emit updated user data
+  }
+}
