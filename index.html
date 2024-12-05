@@ -1,26 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { SharedService } from '../shared.service';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
-@Component({
-  selector: 'app-product-details',
-  template: `
-    <h3>Product Details</h3>
-    <div *ngIf="selectedProduct">
-      <p><strong>Name:</strong> {{ selectedProduct.name }}</p>
-      <p><strong>Details:</strong> {{ selectedProduct.details }}</p>
-    </div>
-    <p *ngIf="!selectedProduct">No product selected.</p>
-  `,
-  styles: []
+@Injectable({
+  providedIn: 'root'
 })
-export class ProductDetailsComponent implements OnInit {
-  selectedProduct: any;
+export class SharedService {
+  private selectedProductSource = new BehaviorSubject<any>(null);
+  selectedProduct$ = this.selectedProductSource.asObservable();
 
-  constructor(private sharedService: SharedService) {}
-
-  ngOnInit(): void {
-    this.sharedService.selectedProduct$.subscribe(product => {
-      this.selectedProduct = product;
-    });
+  setSelectedProduct(product: any): void {
+    this.selectedProductSource.next(product);
   }
 }
