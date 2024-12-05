@@ -1,3 +1,28 @@
-Service-Based Data Sharing
-Use case: Two sibling components need to share a selected product's details.
-Question: Use a shared service to enable data communication between two sibling components. Simulate the selection of a product in one component and display its details in the other.
+import { Component } from '@angular/core';
+import { SharedService } from '../shared.service';
+
+@Component({
+  selector: 'app-product-selector',
+  template: `
+    <h3>Select a Product</h3>
+    <ul>
+      <li *ngFor="let product of products" (click)="selectProduct(product)">
+        {{ product.name }}
+      </li>
+    </ul>
+  `,
+  styles: ['li { cursor: pointer; }']
+})
+export class ProductSelectorComponent {
+  products = [
+    { id: 1, name: 'Product A', details: 'Details of Product A' },
+    { id: 2, name: 'Product B', details: 'Details of Product B' },
+    { id: 3, name: 'Product C', details: 'Details of Product C' }
+  ];
+
+  constructor(private sharedService: SharedService) {}
+
+  selectProduct(product: any): void {
+    this.sharedService.setSelectedProduct(product);
+  }
+}
