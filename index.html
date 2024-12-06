@@ -1,14 +1,3 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SharedService {
-  private selectedProductSource = new BehaviorSubject<any>(null);
-  selectedProduct$ = this.selectedProductSource.asObservable();
-
-  setSelectedProduct(product: any): void {
-    this.selectedProductSource.next(product);
-  }
-}
+Dynamic Component Rendering
+Use case: Display different types of notifications (success, error, info) in a notification container component.
+Question: Implement a notification service and container that dynamically renders notification components based on type.
