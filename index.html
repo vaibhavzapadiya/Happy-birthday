@@ -1,3 +1,167 @@
-Dynamic Component Rendering
-Use case: Display different types of notifications (success, error, info) in a notification container component.
-Question: Implement a notification service and container that dynamically renders notification components based on type.
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-success-notification',
+  template: `<div class="notification success">Success: {{message}}</div>`,
+  styles: [`.success { color: green; }`]
+})
+export class SuccessNotificationComponent {
+  message!: string;
+}
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-error-notification',
+  template: `<div class="notification error">Error: {{message}}</div>`,
+  styles: [`.error { color: red; }`]
+})
+export class ErrorNotificationComponent {
+  message!: string;
+}
+
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-info-notification',
+  template: `<div class="notification info">Info: {{message}}</div>`,
+  styles: [`.info { color: blue; }`]
+})
+export class InfoNotificationComponent {
+  message!: string;
+}
+
+
+
+
+import { Injectable, ComponentRef, Type } from '@angular/core';
+import { Subject } from 'rxjs';
+
+export interface NotificationData {
+  type: 'success' | 'error' | 'info';
+  message: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class NotificationService {
+  private notificationSubject = new Subject<NotificationData>();
+  notifications$ = this.notificationSubject.asObservable();
+
+  showNotification(notification: NotificationData) {
+    this.notificationSubject.next(notification);
+  }
+}
+
+
+
+
+
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ViewContainerRef,
+  ComponentFactoryResolver,
+  ComponentRef,
+} from '@angular/core';
+import { Subscription } from 'rxjs';
+import { NotificationService, NotificationData } from './notification.service';
+import { SuccessNotificationComponent } from './success-notification.component';
+import { ErrorNotificationComponent } from './error-notification.component';
+import { InfoNotificationComponent } from './info-notification.component';
+
+@Component({
+  selector: 'app-notification-container',
+  template: `<ng-container #notificationContainer></ng-container>`,
+})
+export class NotificationContainerComponent implements OnInit, OnDestroy {
+  @ViewChild('notificationContainer', { read: ViewContainerRef, static: true })
+  notificationContainer!: ViewContainerRef;
+
+  private notificationSubscription!: Subscription;
+
+  private componentMap: { [key: string]: Type<any> } = {
+    success: SuccessNotificationComponent,
+    error: ErrorNotificationComponent,
+    info: InfoNotificationComponent,
+  };
+
+  constructor(
+    private notificationService: NotificationService,
+    private resolver: ComponentFactoryResolver
+  ) {}
+
+  ngOnInit() {
+    this.notificationSubscription = this.notificationService.notifications$.subscribe(
+      (notification: NotificationData) => {
+        this.showNotification(notification);
+      }
+    );
+  }
+
+  showNotification(notification: NotificationData) {
+    const componentType = this.componentMap[notification.type];
+    if (componentType) {
+      const factory = this.resolver.resolveComponentFactory(componentType);
+      const componentRef = this.notificationContainer.createComponent(factory);
+      (componentRef.instance as any).message = notification.message;
+
+      // Automatically destroy the notification after a delay
+      setTimeout(() => {
+        this.notificationContainer.clear();
+      }, 3000);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
+  }
+} 
+
+
+
+
+
+
+
+
+import { Component } from '@angular/core';
+import { NotificationService } from './notification.service';
+
+@Component({
+  selector: 'app-root',
+  template: `
+    <button (click)="showSuccess()">Show Success</button>
+    <button (click)="showError()">Show Error</button>
+    <button (click)="showInfo()">Show Info</button>
+    <app-notification-container></app-notification-container>
+  `,
+})
+export class AppComponent {
+  constructor(private notificationService: NotificationService) {}
+
+  showSuccess() {
+    this.notificationService.showNotification({
+      type: 'success',
+      message: 'This is a success message!',
+    });
+  }
+
+  showError() {
+    this.notificationService.showNotification({
+      type: 'error',
+      message: 'This is an error message!',
+    });
+  }
+
+  showInfo() {
+    this.notificationService.showNotification({
+      type: 'info',
+      message: 'This is an info message!',
+    });
+  }
+}
