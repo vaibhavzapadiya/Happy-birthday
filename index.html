@@ -1,56 +1,16 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+Use Case: You need to display a list of products. Create a ProductService that fetches the product list and a SearchService to filter products based on the search term.
 
-@Component({
-  selector: 'app-task-child',
-  template: `
-    <div>
-      <h4>{{ task.name }}</h4>
-      <p>Status: {{ task.completed ? 'Completed' : 'Pending' }}</p>
-      <button (click)="markAsCompleted()" [disabled]="task.completed">Mark as Completed</button>
-    </div>
-  `,
-  styleUrls: ['./task-child.component.css']
-})
-export class TaskChildComponent {
-  @Input() task!: { id: number; name: string; completed: boolean };
-  @Output() taskCompleted = new EventEmitter<number>();
+Business Logic:
+Implement a form to search for products by name. Use SearchService to filter products based on user input.
+The ProductService will fetch products when the component is loaded, and SearchService will filter them dynamically.
+UI:
+Product list displayed in a table.
+Search bar at the top to filter products by name.
+Control IDs:
 
-  markAsCompleted() {
-    this.taskCompleted.emit(this.task.id);
-  }
-}
-
-
-
-
-
-
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-task-parent',
-  template: `
-    <div *ngFor="let task of tasks">
-      <app-task-child
-        [task]="task"
-        (taskCompleted)="onTaskCompleted($event)">
-      </app-task-child>
-    </div>
-  `,
-  styleUrls: ['./task-parent.component.css']
-})
-export class TaskParentComponent {
-  tasks = [
-    { id: 1, name: 'Task 1', completed: false },
-    { id: 2, name: 'Task 2', completed: false },
-    { id: 3, name: 'Task 3', completed: false }
-  ];
-
-  onTaskCompleted(taskId: number) {
-    const task = this.tasks.find(t => t.id === taskId);
-    if (task) {
-      task.completed = true;
-      console.log(`Task ${taskId} marked as completed.`);
-    }
-  }
-}
+Search Form:
+Search Input: searchProduct
+Search Button: searchButton
+Product Table:
+Product Name: productNameColumn
+Product Price: productPriceColumn
