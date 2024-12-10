@@ -1,16 +1,40 @@
-Use Case: You need to display a list of products. Create a ProductService that fetches the product list and a SearchService to filter products based on the search term.
 
-Business Logic:
-Implement a form to search for products by name. Use SearchService to filter products based on user input.
-The ProductService will fetch products when the component is loaded, and SearchService will filter them dynamically.
-UI:
-Product list displayed in a table.
-Search bar at the top to filter products by name.
-Control IDs:
 
-Search Form:
-Search Input: searchProduct
-Search Button: searchButton
-Product Table:
-Product Name: productNameColumn
-Product Price: productPriceColumn
+  <label for="searchProduct" class="form-label">Search Product</label>
+  <input type="text" id="searchProduct" [(ngModel)]="searchitem" class="form-control"/>
+  <button id="searchButton" (click)="searchProduct()" class="btn btn-primary">Search</button>
+
+<h2>Products</h2>
+<table class="table table-striped">
+  <thead class="table-header">
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+      <th>action</th>
+    </tr>
+  </thead>
+  <tbody *ngFor="let item of filteredproducts; let i = index">
+    <tr>
+      <td>{{ item.name }}</td>
+      <td>{{ item.price }}</td>
+      <td><button (click)="Edititem(i)" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Edit</button> <button (click)="delete(i)" class="btn btn-danger">Delete</button></td>
+
+    </tr>
+  </tbody>
+</table>
+
+<p>{{ ressult }}</p>
+
+
+<form [formGroup]="form" *ngIf="editmode" class="form-group" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <label for="name" class="form-label" >Name</label>
+    <input type="text" id="name" name="name" formControlName="name" class="form-control"/>  
+
+    <label for="price" class="form-label">Price</label>
+    <input type="number" id="price" name="price"formControlName="price" class="form-control"/>
+
+    <button (click)="update()" class="btn btn-primary">Update</button>
+    <button (click)="cancel()" class="btn btn-secondary">Cancel</button>
+   
+</form>
+
