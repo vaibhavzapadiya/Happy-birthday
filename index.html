@@ -1,40 +1,65 @@
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.css']
+})
+export class ProductListComponent {
+  products = [
+    { name: 'Product 1', price: 100 },
+    { name: 'Product 2', price: 200 },
+    { name: 'Product 3', price: 300 }
+  ];
+  filteredproducts = [...this.products]; // For search functionality
+  form: FormGroup;
+  editmode = false;
+  currentEditIndex: number | null = null;
 
-  <label for="searchProduct" class="form-label">Search Product</label>
-  <input type="text" id="searchProduct" [(ngModel)]="searchitem" class="form-control"/>
-  <button id="searchButton" (click)="searchProduct()" class="btn btn-primary">Search</button>
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      name: ['', Validators.required],
+      price: [0, [Validators.required, Validators.min(0)]]
+    });
+  }
 
-<h2>Products</h2>
-<table class="table table-striped">
-  <thead class="table-header">
-    <tr>
-      <th>Name</th>
-      <th>Price</th>
-      <th>action</th>
-    </tr>
-  </thead>
-  <tbody *ngFor="let item of filteredproducts; let i = index">
-    <tr>
-      <td>{{ item.name }}</td>
-      <td>{{ item.price }}</td>
-      <td><button (click)="Edititem(i)" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Edit</button> <button (click)="delete(i)" class="btn btn-danger">Delete</button></td>
+  searchProduct() {
+    this.filteredproducts = this.products.filter(product =>
+      product.name.toLowerCase().includes(this.searchitem.toLowerCase())
+    );
+  }
 
-    </tr>
-  </tbody>
-</table>
+  Edititem(index: number) {
+    this.editmode = true;
+    this.currentEditIndex = index;
+    const product = this.products[index];
+    this.form.patchValue({
+      name: product.name,
+      price: product.price
+    });
+    // Show the modal
+    $('#editModal').modal('show');
+  }
 
-<p>{{ ressult }}</p>
+  update() {
+    if (this.currentEditIndex !== null) {
+      this.products[this.currentEditIndex] = this.form.value;
+      this.filteredproducts = [...this.products]; // Refresh filtered list
+    }
+    this.cancel();
+  }
 
+  delete(index: number) {
+    this.products.splice(index, 1);
+    this.filteredproducts = [...this.products];
+  }
 
-<form [formGroup]="form" *ngIf="editmode" class="form-group" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <label for="name" class="form-label" >Name</label>
-    <input type="text" id="name" name="name" formControlName="name" class="form-control"/>  
-
-    <label for="price" class="form-label">Price</label>
-    <input type="number" id="price" name="price"formControlName="price" class="form-control"/>
-
-    <button (click)="update()" class="btn btn-primary">Update</button>
-    <button (click)="cancel()" class="btn btn-secondary">Cancel</button>
-   
-</form>
-
+  cancel() {
+    this.editmode = false;
+    this.currentEditIndex = null;
+    this.form.reset();
+    // Hide the modal
+    $('#editModal').modal('hide');
+  }
+}
