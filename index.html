@@ -1,74 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FeedbackserviceService } from '../feedbackservice.service';
-import { CommonModule } from '@angular/common';
-import { Feedback } from '../feedbackservice.service';
+Order Management System
+Use Case: Manage orders for an e-commerce site. OrderService manages the order details and PaymentService handles payment processing.
 
-@Component({
-  selector: 'app-feedback',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './feedback.component.html',
-  styleUrls: ['./feedback.component.css'], // Corrected property name
-})
-export class FeedbackComponent implements OnInit {
-  form: FormGroup;
-  feedbacklist: Feedback[] = [];
-  editmode: boolean = false;
-  editindex: number | null = null;
+Business Logic:
+On order submission, use the OrderService to save the order, and PaymentService to handle payment status.
+Display a list of orders with their status (pending, processed, completed).
+UI:
+Form to place an order (order details, payment status).
+Display all orders in a table with their status.
+Control IDs:
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private feedbackservice: FeedbackserviceService
-  ) {
-    this.form = this.formBuilder.group({
-      customerName: [''],
-      feedbackMessage: [''],
-      feedbackRating: [''],
-    });
-  }
-
-  ngOnInit() {
-    this.refreshFeedbackList();
-  }
-
-  refreshFeedbackList() {
-    this.feedbacklist = this.feedbackservice.getFeedback();
-  }
-
-  submitFeedback() {
-    if (this.editmode && this.editindex !== null) {
-      this.feedbackservice.updateFeedback(this.editindex, this.form.value);
-      this.editmode = false;
-      this.editindex = null;
-    } else {
-      this.feedbackservice.submitFeedback(this.form.value);
-    }
-    this.form.reset();
-    this.refreshFeedbackList(); // Refresh list after submission
-  }
-
-  editFeedback(id: number) {
-    const feedback = this.feedbacklist[id];
-    if (!feedback) return; // Safety check
-    this.editmode = true;
-    this.editindex = id;
-    this.form.patchValue(feedback);
-  }
-
-  delete(id: number) {
-    this.feedbackservice.deleteFeedback(id);
-    this.refreshFeedbackList(); // Refresh list after deletion
-  }
-
-  cancel() {
-    this.editmode = false;
-    this.editindex = null;
-    this.form.reset();
-  }
-
-  searchFeedback(value: string) {
-    this.feedbackservice.findFilteredFeedback(value);
-    this.refreshFeedbackList(); // Refresh list to display filtered results
-  }
-}
+Order Form:
+Order Item: orderItem
+Quantity: orderQuantity
+Payment Status: paymentStatus
+Submit Button: placeOrderButton
+Orders Table:
+Order ID: orderIdColumn
+Order Item: orderItemColumn
+Quantity: orderQuantityColumn
+Payment Status: orderPaymentStatusColumn
+Edit Button: editOrderButton
+Delete Button: deleteOrderButton
