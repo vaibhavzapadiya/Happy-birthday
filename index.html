@@ -1,62 +1,43 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FeedbackserviceService } from '../feedbackservice.service';
-import { CommonModule } from '@angular/common';
-import { Feedback } from '../feedbackservice.service';
+import { Injectable } from '@angular/core';
+export interface Feedback {
+  customerName: string;
+  feedbackMessage: string;
+  feedbackRating: number;
+}
 
-@Component({
-  selector: 'app-feedback',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './feedback.component.html',
-  styleUrls: ['./feedback.component.css'], // Corrected property name
+@Injectable({
+  providedIn: 'root'
 })
-export class FeedbackComponent implements OnInit {
-  form: FormGroup;
-  feedbacklist: Feedback[] = [];
-  editmode: boolean = false;
-  editindex: number | null = null; // Initialized to null
+export class FeedbackserviceService {
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private feedbackservice: FeedbackserviceService
-  ) {
-    this.form = this.formBuilder.group({
-      customerName: [''],
-      feedbackMessage: [''],
-      feedbackRating: [''],
-    });
+  feedbacklist:Feedback[] = [
+    
+  ];
+
+  filteredfeedback:Feedback[] = [];
+
+  constructor() { }
+
+
+  submitFeedback(feedback: Feedback) {
+    this.feedbacklist.push(feedback);
+    this.filteredfeedback=this.feedbacklist;
   }
-
-  ngOnInit() {
-    this.feedbacklist = this.feedbackservice.getFeedback();
+  updateFeedback(editindex:number,feedback: Feedback,) {
+    this.feedbacklist[editindex] = feedback;
+    this.filteredfeedback=this.feedbacklist;
   }
+  deleteFeedback(id:number) {
+    this.feedbacklist.splice(id,1);
+    this.filteredfeedback=this.feedbacklist;
 
-  submitFeedback() {
-    if (this.editmode && this.editindex !== null) {
-      this.feedbackservice.updateFeedback(this.editindex, this.form.value);
-      this.editmode = false;
-      this.editindex = null; // Resetting after editing
-    } else {
-      this.feedbackservice.submitFeedback(this.form.value);
-    }
-    this.form.reset(); // Reset form in both cases
   }
-
-  editFeedback(id: number) {
-    this.editmode = true;
-    this.editindex = id;
-    this.form.patchValue(this.feedbacklist[id]);
+  getFeedback() {
+    return this.feedbacklist;
   }
+  findfilteredfeedback(value:string){
+    this.filteredfeedback=this.feedbacklist.filter(feedback=>feedback.customerName.includes(value));
 
-  delete(id: number) {
-    this.feedbackservice.deleteFeedback(id); // Assuming service handles deletion
-    this.feedbacklist = this.feedbackservice.getFeedback(); // Refresh list
-  }
 
-  cancel() {
-    this.editmode = false;
-    this.editindex = null; // Reset edit index
-    this.form.reset();
   }
 }
