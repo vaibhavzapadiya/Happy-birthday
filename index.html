@@ -1,19 +1,117 @@
-Observables: User Dashboard with Real-time Data
-Use Case: You are building a user dashboard that fetches data (e.g., user activities, notifications) in real-time using Observables.
+<div id="dashboardSection">
+  <h2>User Dashboard</h2>
 
-Business Logic:
-Create a UserService that returns user activity data and notifications using an Observable.
-The component will subscribe to the Observable and update the dashboard when new data arrives.
-Implement a refresh button to manually trigger the refresh of data.
-UI:
-A User Dashboard with sections for user activity and notifications.
-Refresh Button to fetch new data.
-Control IDs:
+  <button id="refreshButton" (click)="refreshData()">Refresh</button>
 
-Dashboard Sections:
-Activity List: activityListSection
-Notifications List: notificationsListSection
-Refresh Button: refreshButton
-Data Display:
-Activity Item: activityItem
-Notification Item: notificationItem
+  <div id="activityListSection">
+    <h3>Activities</h3>
+    <ul>
+      <li id="activityItem" *ngFor="let activity of activities">
+        {{ activity.activity }} - {{ activity.timestamp | date: 'short' }}
+      </li>
+    </ul>
+  </div>
+
+  <div id="notificationsListSection">
+    <h3>Notifications</h3>
+    <ul>
+      <li id="notificationItem" *ngFor="let notification of notifications">
+        {{ notification.message }} - {{ notification.timestamp | date: 'short' }}
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+
+
+
+
+
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { UserService } from './user.service';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-user-dashboard',
+  templateUrl: './user-dashboard.component.html',
+  styleUrls: ['./user-dashboard.component.css']
+})
+export class UserDashboardComponent implements OnInit, OnDestroy {
+  activities: any[] = [];
+  notifications: any[] = [];
+  private subscriptions: Subscription = new Subscription();
+
+  constructor(private userService: UserService) {}
+
+  ngOnInit(): void {
+    // Subscribe to real-time data
+    this.subscriptions.add(
+      this.userService.getActivities().subscribe((data) => (this.activities = data))
+    );
+
+    this.subscriptions.add(
+      this.userService.getNotifications().subscribe((data) => (this.notifications = data))
+    );
+  }
+
+  // Manual refresh
+  refreshData(): void {
+    this.userService.refreshData().subscribe((data) => {
+      this.activities = data.activities;
+      this.notifications = data.notifications;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+}
+
+
+
+
+
+
+
+import { Injectable } from '@angular/core';
+import { Observable, of, interval } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  // Mock Data
+  private activities = [
+    { id: 1, activity: 'Logged in', timestamp: new Date() },
+    { id: 2, activity: 'Viewed Dashboard', timestamp: new Date() }
+  ];
+
+  private notifications = [
+    { id: 1, message: 'New message from Admin', timestamp: new Date() },
+    { id: 2, message: 'System maintenance scheduled', timestamp: new Date() }
+  ];
+
+  // Simulate fetching activities
+  getActivities(): Observable<any[]> {
+    return interval(5000).pipe(
+      map(() => this.activities.map((a) => ({ ...a, timestamp: new Date() })))
+    );
+  }
+
+  // Simulate fetching notifications
+  getNotifications(): Observable<any[]> {
+    return interval(7000).pipe(
+      map(() => this.notifications.map((n) => ({ ...n, timestamp: new Date() })))
+    );
+  }
+
+  // Manual refresh
+  refreshData(): Observable<{ activities: any[]; notifications: any[] }> {
+    return of({
+      activities: this.activities.map((a) => ({ ...a, timestamp: new Date() })),
+      notifications: this.notifications.map((n) => ({ ...n, timestamp: new Date() }))
+    });
+  }
+}
