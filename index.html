@@ -1,21 +1,62 @@
-Use Case: Build a customer feedback form where the FeedbackService saves and fetches customer feedback.
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FeedbackserviceService } from '../feedbackservice.service';
+import { CommonModule } from '@angular/common';
+import { Feedback } from '../feedbackservice.service';
 
-Business Logic:
-Upon form submission, save the feedback using the FeedbackService.
-The service should save feedback data and also fetch all submitted feedback to display in a table.
-UI:
-A form for customer name, feedback, and rating (1-5).
-Display all feedback in a table with the ability to edit or delete.
-Control IDs:
+@Component({
+  selector: 'app-feedback',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './feedback.component.html',
+  styleUrl: './feedback.component.css',
+})
+export class FeedbackComponent implements OnInit {
+  form: FormGroup;
+  feedbacklist: Feedback[] = [];
+  editmode: boolean = false;
+  editindex!: number;
 
-Feedback Form:
-Customer Name: customerName
-Feedback Message: feedbackMessage
-Rating: feedbackRating
-Submit Button: submitFeedbackButton
-Feedback Table:
-Customer Name: feedbackCustomerNameColumn
-Feedback Message: feedbackMessageColumn
-Rating: feedbackRatingColumn
-Edit Button: editFeedbackButton
-Delete Button: deleteFeedbackButton
+  constructor(
+    private formBuilder: FormBuilder,
+    private feedbackservice: FeedbackserviceService
+  ) {
+    this.form = this.formBuilder.group({
+      customerName: [''],
+      feedbackMessage: [''],
+      feedbackRating: [''],
+    });
+  }
+
+  ngOnInit() {
+    this.feedbacklist = this.feedbackservice.getFeedback();
+  }
+
+  submitFeedback() {
+
+    if(this.editindex && this.editindex!==null){
+      this.feedbackservice.updateFeedback(this.editindex,this.form.value,);
+      this.editmode = false;
+   this.form.reset();
+    }
+  else{
+console.log('fd');
+
+    this.feedbackservice.submitFeedback(this.form.value);
+    this.form.reset();
+  }
+  }
+  editfeedback(id: number) {
+    this.editmode = true;
+    this.editindex = id;
+    this.form.patchValue(this.feedbacklist[id]);
+  }
+  delete(id: number) {}
+  cancle(){
+    this.editmode = false;
+    this.editindex!;
+    this.form.reset();
+  }
+  }
+ 
+
