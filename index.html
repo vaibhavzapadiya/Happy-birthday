@@ -1,48 +1,74 @@
-import { Injectable } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FeedbackserviceService } from '../feedbackservice.service';
+import { CommonModule } from '@angular/common';
+import { Feedback } from '../feedbackservice.service';
 
-export interface Feedback {
-  customerName: string;
-  feedbackMessage: string;
-  feedbackRating: number;
-}
-
-@Injectable({
-  providedIn: 'root',
+@Component({
+  selector: 'app-feedback',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './feedback.component.html',
+  styleUrls: ['./feedback.component.css'], // Corrected property name
 })
-export class FeedbackserviceService {
+export class FeedbackComponent implements OnInit {
+  form: FormGroup;
   feedbacklist: Feedback[] = [];
-  filteredfeedback: Feedback[] | null = null;
+  editmode: boolean = false;
+  editindex: number | null = null;
 
-  constructor() {}
-
-  submitFeedback(feedback: Feedback) {
-    this.feedbacklist.push(feedback);
-    this.filteredfeedback = null; // Reset filtering when a new feedback is added
+  constructor(
+    private formBuilder: FormBuilder,
+    private feedbackservice: FeedbackserviceService
+  ) {
+    this.form = this.formBuilder.group({
+      customerName: [''],
+      feedbackMessage: [''],
+      feedbackRating: [''],
+    });
   }
 
-  updateFeedback(editindex: number, feedback: Feedback) {
-    if (editindex >= 0 && editindex < this.feedbacklist.length) {
-      this.feedbacklist[editindex] = feedback;
-      this.filteredfeedback = null; // Reset filtering when feedback is updated
+  ngOnInit() {
+    this.refreshFeedbackList();
+  }
+
+  refreshFeedbackList() {
+    this.feedbacklist = this.feedbackservice.getFeedback();
+  }
+
+  submitFeedback() {
+    if (this.editmode && this.editindex !== null) {
+      this.feedbackservice.updateFeedback(this.editindex, this.form.value);
+      this.editmode = false;
+      this.editindex = null;
+    } else {
+      this.feedbackservice.submitFeedback(this.form.value);
     }
+    this.form.reset();
+    this.refreshFeedbackList(); // Refresh list after submission
   }
 
-  deleteFeedback(id: number) {
-    if (id >= 0 && id < this.feedbacklist.length) {
-      this.feedbacklist.splice(id, 1);
-      this.filteredfeedback = null; // Reset filtering after deletion
-    }
+  editFeedback(id: number) {
+    const feedback = this.feedbacklist[id];
+    if (!feedback) return; // Safety check
+    this.editmode = true;
+    this.editindex = id;
+    this.form.patchValue(feedback);
   }
 
-  getFeedback(): Feedback[] {
-    // Return filtered feedback if filtering is active
-    return this.filteredfeedback || this.feedbacklist;
+  delete(id: number) {
+    this.feedbackservice.deleteFeedback(id);
+    this.refreshFeedbackList(); // Refresh list after deletion
   }
 
-  findFilteredFeedback(value: string) {
-    const searchTerm = value.trim().toLowerCase();
-    this.filteredfeedback = this.feedbacklist.filter((feedback) =>
-      feedback.customerName.toLowerCase().includes(searchTerm)
-    );
+  cancel() {
+    this.editmode = false;
+    this.editindex = null;
+    this.form.reset();
+  }
+
+  searchFeedback(value: string) {
+    this.feedbackservice.findFilteredFeedback(value);
+    this.refreshFeedbackList(); // Refresh list to display filtered results
   }
 }
