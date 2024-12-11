@@ -9,13 +9,13 @@ import { Feedback } from '../feedbackservice.service';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './feedback.component.html',
-  styleUrl: './feedback.component.css',
+  styleUrls: ['./feedback.component.css'], // Corrected property name
 })
 export class FeedbackComponent implements OnInit {
   form: FormGroup;
   feedbacklist: Feedback[] = [];
   editmode: boolean = false;
-  editindex!: number;
+  editindex: number | null = null; // Initialized to null
 
   constructor(
     private formBuilder: FormBuilder,
@@ -33,30 +33,30 @@ export class FeedbackComponent implements OnInit {
   }
 
   submitFeedback() {
-
-    if(this.editindex && this.editindex!==null){
-      this.feedbackservice.updateFeedback(this.editindex,this.form.value,);
+    if (this.editmode && this.editindex !== null) {
+      this.feedbackservice.updateFeedback(this.editindex, this.form.value);
       this.editmode = false;
-   this.form.reset();
+      this.editindex = null; // Resetting after editing
+    } else {
+      this.feedbackservice.submitFeedback(this.form.value);
     }
-  else{
-console.log('fd');
+    this.form.reset(); // Reset form in both cases
+  }
 
-    this.feedbackservice.submitFeedback(this.form.value);
-    this.form.reset();
-  }
-  }
-  editfeedback(id: number) {
+  editFeedback(id: number) {
     this.editmode = true;
     this.editindex = id;
     this.form.patchValue(this.feedbacklist[id]);
   }
-  delete(id: number) {}
-  cancle(){
+
+  delete(id: number) {
+    this.feedbackservice.deleteFeedback(id); // Assuming service handles deletion
+    this.feedbacklist = this.feedbackservice.getFeedback(); // Refresh list
+  }
+
+  cancel() {
     this.editmode = false;
-    this.editindex!;
+    this.editindex = null; // Reset edit index
     this.form.reset();
   }
-  }
- 
-
+}
