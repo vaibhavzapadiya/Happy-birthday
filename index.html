@@ -1,23 +1,19 @@
-Order Management System
-Use Case: Manage orders for an e-commerce site. OrderService manages the order details and PaymentService handles payment processing.
+Observables: User Dashboard with Real-time Data
+Use Case: You are building a user dashboard that fetches data (e.g., user activities, notifications) in real-time using Observables.
 
 Business Logic:
-On order submission, use the OrderService to save the order, and PaymentService to handle payment status.
-Display a list of orders with their status (pending, processed, completed).
+Create a UserService that returns user activity data and notifications using an Observable.
+The component will subscribe to the Observable and update the dashboard when new data arrives.
+Implement a refresh button to manually trigger the refresh of data.
 UI:
-Form to place an order (order details, payment status).
-Display all orders in a table with their status.
+A User Dashboard with sections for user activity and notifications.
+Refresh Button to fetch new data.
 Control IDs:
 
-Order Form:
-Order Item: orderItem
-Quantity: orderQuantity
-Payment Status: paymentStatus
-Submit Button: placeOrderButton
-Orders Table:
-Order ID: orderIdColumn
-Order Item: orderItemColumn
-Quantity: orderQuantityColumn
-Payment Status: orderPaymentStatusColumn
-Edit Button: editOrderButton
-Delete Button: deleteOrderButton
+Dashboard Sections:
+Activity List: activityListSection
+Notifications List: notificationsListSection
+Refresh Button: refreshButton
+Data Display:
+Activity Item: activityItem
+Notification Item: notificationItem
