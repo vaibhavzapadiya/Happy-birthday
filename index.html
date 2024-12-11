@@ -1,96 +1,21 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+Use Case: Build a customer feedback form where the FeedbackService saves and fetches customer feedback.
 
-@Component({
-  selector: 'app-product-list',
-  templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css']
-})
-export class ProductListComponent {
-  products = [
-    { name: 'Product 1', price: 100 },
-    { name: 'Product 2', price: 200 },
-    { name: 'Product 3', price: 300 }
-  ];
-  filteredproducts = [...this.products]; // For search functionality
-  form: FormGroup;
-  editmode = false;
-  currentEditIndex: number | null = null;
+Business Logic:
+Upon form submission, save the feedback using the FeedbackService.
+The service should save feedback data and also fetch all submitted feedback to display in a table.
+UI:
+A form for customer name, feedback, and rating (1-5).
+Display all feedback in a table with the ability to edit or delete.
+Control IDs:
 
-  constructor(private fb: FormBuilder) {
-    this.form = this.fb.group({
-      name: ['', Validators.required],
-      price: [0, [Validators.required, Validators.min(0)]]
-    });
-  }
-
-  searchProduct() {
-    this.filteredproducts = this.products.filter(product =>
-      product.name.toLowerCase().includes(this.searchitem.toLowerCase())
-    );
-  }
-
-  Edititem(index: number) {
-    this.editmode = true;
-    this.currentEditIndex = index;
-    const product = this.products[index];
-    this.form.patchValue({
-      name: product.name,
-      price: product.price
-    });
-    // Show the modal
-    $('#editModal').modal('show');
-  }
-
-  update() {
-    if (this.currentEditIndex !== null) {
-      this.products[this.currentEditIndex] = this.form.value;
-      this.filteredproducts = [...this.products]; // Refresh filtered list
-    }
-    this.cancel();
-  }
-
-  delete(index: number) {
-    this.products.splice(index, 1);
-    this.filteredproducts = [...this.products];
-  }
-
-  cancel() {
-    this.editmode = false;
-    this.currentEditIndex = null;
-    this.form.reset();
-    // Hide the modal
-    $('#editModal').modal('hide');
-  }
-}
-
-
-
-
-
-<!-- Modal Structure -->
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Edit Product</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form [formGroup]="form" class="form-group">
-          <label for="name" class="form-label">Name</label>
-          <input type="text" id="name" formControlName="name" class="form-control" />
-
-          <label for="price" class="form-label">Price</label>
-          <input type="number" id="price" formControlName="price" class="form-control" />
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancel()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="update()">Update</button>
-      </div>
-    </div>
-  </div>
-</div>
+Feedback Form:
+Customer Name: customerName
+Feedback Message: feedbackMessage
+Rating: feedbackRating
+Submit Button: submitFeedbackButton
+Feedback Table:
+Customer Name: feedbackCustomerNameColumn
+Feedback Message: feedbackMessageColumn
+Rating: feedbackRatingColumn
+Edit Button: editFeedbackButton
+Delete Button: deleteFeedbackButton
