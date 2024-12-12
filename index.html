@@ -1,39 +1,43 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Product, ProductServiceService } from '../product-service.service';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-product-item',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './product-item.component.html',
-  styleUrl: './product-item.component.css'
+  styleUrls: ['./product-item.component.css'], // Corrected property name
 })
-export class ProductItemComponent implements OnInit {
+export class ProductItemComponent implements OnInit, OnDestroy {
   searchInput = new FormControl('');
+  products: Product[] = [];
+  private subscription!: Subscription; // Manage subscription for cleanup
 
-  products:Product[]=[];
-  constructor(private productService:ProductServiceService) {
+  constructor(private productService: ProductServiceService) {}
 
-  }
   ngOnInit(): void {
-    if(this.searchInput.value){
-      this.searchInput.valueChanges.subscribe((value) => {
-        this.productService.searchProducts(value!).subscribe((data)=>{   
-          this.products=data;
-        })
-      })  
-      }
-    else{
-      this.products=this.productService.products;
-    } 
-    
+    this.subscription = this.searchInput.valueChanges
+      .pipe(
+        debounceTime(300), // Delay to reduce frequent API calls
+        distinctUntilChanged() // Only emit if the value has changed
+      )
+      .subscribe((value) => {
+        if (value) {
+          this.productService.searchProducts(value).subscribe((data) => {
+            this.products = data;
+          });
+        } else {
+          this.products = this.productService.products;
+        }
+      });
   }
 
-
-
-
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe(); // Clean up subscription
+    }
   }
-
+}
