@@ -1,43 +1,17 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Product, ProductServiceService } from '../product-service.service';
-import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
+Use Case: Fetch user details from a server using Observables and RxJS operators like map and catchError to process data and handle errors.
 
-@Component({
-  selector: 'app-product-item',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './product-item.component.html',
-  styleUrls: ['./product-item.component.css'], // Corrected property name
-})
-export class ProductItemComponent implements OnInit, OnDestroy {
-  searchInput = new FormControl('');
-  products: Product[] = [];
-  private subscription!: Subscription; // Manage subscription for cleanup
+Business Logic:
+Create a UserService that returns user data from an API endpoint.
+Use RxJS operators like map to transform data and catchError to handle errors gracefully.
+Display the user data or an error message in the component.
+UI:
+Display the user’s name, email, and other details if the fetch is successful.
+Show an error message if the request fails.
+Control IDs:
 
-  constructor(private productService: ProductServiceService) {}
-
-  ngOnInit(): void {
-    this.subscription = this.searchInput.valueChanges
-      .pipe(
-        debounceTime(300), // Delay to reduce frequent API calls
-        distinctUntilChanged() // Only emit if the value has changed
-      )
-      .subscribe((value) => {
-        if (value) {
-          this.productService.searchProducts(value).subscribe((data) => {
-            this.products = data;
-          });
-        } else {
-          this.products = this.productService.products;
-        }
-      });
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe(); // Clean up subscription
-    }
-  }
-}
+User Data:
+User Name: userName
+User Email: userEmail
+User Address: userAddress
+Error Message:
+Error Message: errorMessage
