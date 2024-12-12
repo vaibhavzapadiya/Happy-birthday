@@ -7,35 +7,35 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './stocklist.component.html',
-  styleUrl: './stocklist.component.css'
+  styleUrls: ['./stocklist.component.css'], // Fixed typo
 })
-export class StocklistComponent  implements OnInit {
+export class StocklistComponent implements OnInit {
   stocks: Stock[] = [];
-isupadting:boolean=false;
-  constructor(private stockService: StockServiceService) { }
+  isUpdating: boolean = false; // Fixed casing
+
+  constructor(private stockService: StockServiceService) {}
+
   ngOnInit(): void {
     this.stocks = this.stockService.stocks;
   }
 
-  sendStock(stockname:string,price:number){
-    this.isupadting=true; 
-    this.stockService.Updatestocksprice(stockname,price).subscribe({
-      next: (data) => {
-        this.stocks = data;
+  sendStock(stockname: string, price: number): void {
+    this.isUpdating = true;
+    this.stockService.updateStockPrice(stockname, price).subscribe({
+      next: (updatedStocks) => {
+        this.stocks = updatedStocks;
       },
       error: (err) => {
-        console.log(err);
+        console.error('Error updating stock:', err);
       },
     });
-
-  }
-  stopupadate(stockname:string,price:number){
-this.isupadting=false;
-
   }
 
+  stopUpdate(stockname: string): void {
+    this.isUpdating = false;
+    this.stockService.stopUpdatingPrice(stockname);
+  }
 }
-
 
 
 
@@ -44,17 +44,19 @@ this.isupadting=false;
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+
 export interface Stock {
   stockname: string;
   price: number;
 }
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StockServiceService {
+  private updateIntervals: { [key: string]: any } = {}; // Track intervals
 
-  constructor() { }
-  stocks:Stock[] = [
+  stocks: Stock[] = [
     { stockname: 'iPhone', price: 1000 },
     { stockname: 'Samsung', price: 2000 },
     { stockname: 'OnePlus', price: 3000 },
@@ -65,33 +67,24 @@ export class StockServiceService {
     { stockname: 'Oppo', price: 8000 },
     { stockname: 'Redmi', price: 9000 },
     { stockname: 'Asus', price: 10000 },
-  ]
+  ];
 
-  Updatestocksprice(stockname:string,price:number):Observable<Stock[]>{
-    const stock = this.stocks.find(stock => stock.stockname === stockname);
-    if(stock){
- 
-      setInterval(() => {
+  constructor() {}
 
-        price=price+100;
-        stock.price = price;
-        
+  updateStockPrice(stockname: string, price: number): Observable<Stock[]> {
+    const stock = this.stocks.find((s) => s.stockname === stockname);
+    if (stock && !this.updateIntervals[stockname]) {
+      this.updateIntervals[stockname] = setInterval(() => {
+        stock.price += 100; // Increment price
       }, 3000);
-     
     }
     return of(this.stocks);
   }
-  sopupdatingprice(stockname:string,price:number){
-const stock=this.stocks.find(stock=>stock.stockname===stockname);
-if(stock){
 
-
-  this.Updatestocksprice(stockname,price).unsubscribe();
-
+  stopUpdatingPrice(stockname: string): void {
+    if (this.updateIntervals[stockname]) {
+      clearInterval(this.updateIntervals[stockname]); // Stop the interval
+      delete this.updateIntervals[stockname];
+    }
   }
-
-
-}
-
-
 }
