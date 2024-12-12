@@ -1,90 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { Stock, StockServiceService } from '../stock-service.service';
-import { CommonModule } from '@angular/common';
+Use Case: Implement a real-time chat application where messages are sent and received using Observables.
 
-@Component({
-  selector: 'app-stocklist',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './stocklist.component.html',
-  styleUrls: ['./stocklist.component.css'], // Fixed typo
-})
-export class StocklistComponent implements OnInit {
-  stocks: Stock[] = [];
-  isUpdating: boolean = false; // Fixed casing
+Business Logic:
+Create a ChatService that emits new messages via an Observable whenever a new message is sent.
+Use RxJS operators to filter, map, or combine messages.
+The component subscribes to the Observable and updates the chat window with new messages.
+UI:
+Chat Input Box to type messages.
+Message List that updates in real-time.
+Send Button to send messages.
+Control IDs:
 
-  constructor(private stockService: StockServiceService) {}
-
-  ngOnInit(): void {
-    this.stocks = this.stockService.stocks;
-  }
-
-  sendStock(stockname: string, price: number): void {
-    this.isUpdating = true;
-    this.stockService.updateStockPrice(stockname, price).subscribe({
-      next: (updatedStocks) => {
-        this.stocks = updatedStocks;
-      },
-      error: (err) => {
-        console.error('Error updating stock:', err);
-      },
-    });
-  }
-
-  stopUpdate(stockname: string): void {
-    this.isUpdating = false;
-    this.stockService.stopUpdatingPrice(stockname);
-  }
-}
-
-
-
-
-
-
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-
-export interface Stock {
-  stockname: string;
-  price: number;
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class StockServiceService {
-  private updateIntervals: { [key: string]: any } = {}; // Track intervals
-
-  stocks: Stock[] = [
-    { stockname: 'iPhone', price: 1000 },
-    { stockname: 'Samsung', price: 2000 },
-    { stockname: 'OnePlus', price: 3000 },
-    { stockname: 'Google Pixel', price: 4000 },
-    { stockname: 'Moto G', price: 5000 },
-    { stockname: 'Xiaomi', price: 6000 },
-    { stockname: 'Huawei', price: 7000 },
-    { stockname: 'Oppo', price: 8000 },
-    { stockname: 'Redmi', price: 9000 },
-    { stockname: 'Asus', price: 10000 },
-  ];
-
-  constructor() {}
-
-  updateStockPrice(stockname: string, price: number): Observable<Stock[]> {
-    const stock = this.stocks.find((s) => s.stockname === stockname);
-    if (stock && !this.updateIntervals[stockname]) {
-      this.updateIntervals[stockname] = setInterval(() => {
-        stock.price += 100; // Increment price
-      }, 3000);
-    }
-    return of(this.stocks);
-  }
-
-  stopUpdatingPrice(stockname: string): void {
-    if (this.updateIntervals[stockname]) {
-      clearInterval(this.updateIntervals[stockname]); // Stop the interval
-      delete this.updateIntervals[stockname];
-    }
-  }
-}
+Chat Window:
+Message Input: messageInput
+Send Button: sendMessageButton
+Message List: messageList
+Individual Message: messageItem
