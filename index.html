@@ -1,19 +1,39 @@
-Observables: Live Search for Products
-Use Case: Implement a live search for products that filters results as the user types in the search box, using an Observable for real-time data.
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Product, ProductServiceService } from '../product-service.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
-Business Logic:
-Create a ProductService that returns an Observable of product data.
-The component subscribes to the search Observable, triggering the ProductService each time the user types a new search term.
-Display the filtered results dynamically.
-UI:
-Search Box to input the search term.
-Product List that updates in real-time as the search term is entered.
-Control IDs:
+@Component({
+  selector: 'app-product-item',
+  standalone: true,
+  imports: [ReactiveFormsModule,CommonModule],
+  templateUrl: './product-item.component.html',
+  styleUrl: './product-item.component.css'
+})
+export class ProductItemComponent implements OnInit {
+  searchInput = new FormControl('');
 
-Search Box:
-Search Input: searchInput
-Search Button: searchButton
-Product List:
-Product Name: productNameColumn
-Product Price: productPriceColumn
-Add to Cart Button: addToCartButton
+  products:Product[]=[];
+  constructor(private productService:ProductServiceService) {
+
+  }
+  ngOnInit(): void {
+    if(this.searchInput.value){
+      this.searchInput.valueChanges.subscribe((value) => {
+        this.productService.searchProducts(value!).subscribe((data)=>{   
+          this.products=data;
+        })
+      })  
+      }
+    else{
+      this.products=this.productService.products;
+    } 
+    
+  }
+
+
+
+
+  }
+
