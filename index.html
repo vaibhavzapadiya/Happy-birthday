@@ -1,65 +1,120 @@
-
+<!-- Student List -->
 <h2 class="display-4">Student List</h2>
 <table class="table table-striped">
-<thead class=" table-header">
+  <thead class="table-header">
     <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Address</th>
-        <th>Action</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Address</th>
+      <th>Action</th>
     </tr>
-</thead>
-<tbody class="table-body">
-    <tr *ngFor="let student of studentlist let i = index">
-        <td>{{student.name}}</td>
-        <td>{{student.email}}</td>
-        <td>{{student.phone}}</td>
-        <td>{{student.address}}</td>
-        <td><button class="btn btn-primary" id="editButton" (click)="editstudent(i)">Edit</button> <button class="btn btn-danger" id="deleteButton" (click)="deletestudent(i)">Delete</button></td>
-</tbody>
-
+  </thead>
+  <tbody class="table-body">
+    <tr *ngFor="let student of studentlist; let i = index">
+      <td>{{ student.name }}</td>
+      <td>{{ student.email }}</td>
+      <td>{{ student.phone }}</td>
+      <td>{{ student.address }}</td>
+      <td>
+        <button class="btn btn-primary" id="editButton" (click)="openEditModal(i)">Edit</button>
+        <button class="btn btn-danger" id="deleteButton" (click)="deletestudent(i)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
 </table>
 
-<form [formGroup]="form" *ngIf="editmode">
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" formControlName="name" class="form-control">
+<!-- Edit Modal -->
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  aria-labelledby="editModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Student</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <label for="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            formControlName="name"
+            class="form-control"
+          />
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" formControlName="email" class="form-control">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            formControlName="email"
+            class="form-control"
+          />
 
-    <label for="phone">Phone</label>
-    <input type="number" id="phone" name="phone" formControlName="phone" class="form-control">
+          <label for="phone">Phone</label>
+          <input
+            type="number"
+            id="phone"
+            name="phone"
+            formControlName="phone"
+            class="form-control"
+          />
 
-    <label for="address">Address</label>
-    <input type="text" id="address" name="address" formControlName="address" class="form-control">
+          <label for="address">Address</label>
+          <input
+            type="text"
+            id="address"
+            name="address"
+            formControlName="address"
+            class="form-control"
+          />
 
-    <label for="city">City</label>
-    <input type="text" id="city" name="city" formControlName="city" class="form-control">
+          <label for="city">City</label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            formControlName="city"
+            class="form-control"
+          />
 
-    <label for="state">State</label>
-    <input type="text" id="state" name="state" formControlName="state" class="form-control">
-
-    <button (click)="submit()" class="btn btn-primary">Submit</button>
-    <button (click)="cancel()" class="btn btn-secondary">Cancel</button>
-</form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          <label for="state">State</label>
+          <input
+            type="text"
+            id="state"
+            name="state"
+            formControlName="state"
+            class="form-control"
+          />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="submit()"
+          data-bs-dismiss="modal"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -71,49 +126,69 @@ import { Student } from '../student-form/student-form.component';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
+declare var bootstrap: any; // Declare Bootstrap globally for modal manipulation
+
 @Component({
   selector: 'app-student-list',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './student-list.component.html',
-  styleUrl: './student-list.component.css',
+  styleUrls: ['./student-list.component.css'],
 })
 export class StudentListComponent implements OnInit {
   editmode: boolean = false;
   editindex: number | null = null;
   studentlist: Student[] = [];
-  form:FormGroup;
+  form: FormGroup;
 
-  constructor(private fb:FormBuilder,private studentservice:StudentService){
-    this.form=this.fb.group({
-
-      name:['',Validators.required],
-      email:['',Validators.required],
-      phone:['',Validators.required],
-      address:['',Validators.required],
-      city:['',Validators.required],
-      state:['',Validators.required],
-
-    })
+  constructor(
+    private fb: FormBuilder,
+    private studentservice: StudentService
+  ) {
+    this.form = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', Validators.required],
+      phone: ['', Validators.required],
+      address: ['', Validators.required],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+    });
   }
 
   ngOnInit(): void {
     this.getstudentlist();
   }
+
   getstudentlist() {
     this.studentlist = this.studentservice.Students;
   }
-  editstudent(id: number) {
-    this.editmode=true;
-    this.editindex=id;
-    this.studentservice.editStudent(id);
 
+  openEditModal(index: number) {
+    this.editindex = index;
+    this.editmode = true;
 
+    // Populate form with student data
+    const student = this.studentlist[index];
+    this.form.patchValue(student);
+
+    // Open Bootstrap modal
+    const modalElement = document.getElementById('editModal')!;
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
   }
-  deletestudent(id: number) {
-this.studentservice.deleteStudent(id);
 
+  deletestudent(index: number) {
+    this.studentservice.deleteStudent(index);
   }
-  cancel(){}
-  submit(){}
+
+  submit() {
+    if (this.editindex !== null) {
+      // Update the student list with edited values
+      this.studentlist[this.editindex] = this.form.value;
+
+      // Reset form and edit index
+      this.form.reset();
+      this.editindex = null;
+    }
+  }
 }
