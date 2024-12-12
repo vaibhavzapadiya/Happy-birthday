@@ -1,17 +1,97 @@
-Use Case: Fetch user details from a server using Observables and RxJS operators like map and catchError to process data and handle errors.
+import { Component, OnInit } from '@angular/core';
+import { Stock, StockServiceService } from '../stock-service.service';
+import { CommonModule } from '@angular/common';
 
-Business Logic:
-Create a UserService that returns user data from an API endpoint.
-Use RxJS operators like map to transform data and catchError to handle errors gracefully.
-Display the user data or an error message in the component.
-UI:
-Display the user’s name, email, and other details if the fetch is successful.
-Show an error message if the request fails.
-Control IDs:
+@Component({
+  selector: 'app-stocklist',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './stocklist.component.html',
+  styleUrl: './stocklist.component.css'
+})
+export class StocklistComponent  implements OnInit {
+  stocks: Stock[] = [];
+isupadting:boolean=false;
+  constructor(private stockService: StockServiceService) { }
+  ngOnInit(): void {
+    this.stocks = this.stockService.stocks;
+  }
 
-User Data:
-User Name: userName
-User Email: userEmail
-User Address: userAddress
-Error Message:
-Error Message: errorMessage
+  sendStock(stockname:string,price:number){
+    this.isupadting=true; 
+    this.stockService.Updatestocksprice(stockname,price).subscribe({
+      next: (data) => {
+        this.stocks = data;
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
+
+  }
+  stopupadate(stockname:string,price:number){
+this.isupadting=false;
+
+  }
+
+}
+
+
+
+
+
+
+
+import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+export interface Stock {
+  stockname: string;
+  price: number;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class StockServiceService {
+
+  constructor() { }
+  stocks:Stock[] = [
+    { stockname: 'iPhone', price: 1000 },
+    { stockname: 'Samsung', price: 2000 },
+    { stockname: 'OnePlus', price: 3000 },
+    { stockname: 'Google Pixel', price: 4000 },
+    { stockname: 'Moto G', price: 5000 },
+    { stockname: 'Xiaomi', price: 6000 },
+    { stockname: 'Huawei', price: 7000 },
+    { stockname: 'Oppo', price: 8000 },
+    { stockname: 'Redmi', price: 9000 },
+    { stockname: 'Asus', price: 10000 },
+  ]
+
+  Updatestocksprice(stockname:string,price:number):Observable<Stock[]>{
+    const stock = this.stocks.find(stock => stock.stockname === stockname);
+    if(stock){
+ 
+      setInterval(() => {
+
+        price=price+100;
+        stock.price = price;
+        
+      }, 3000);
+     
+    }
+    return of(this.stocks);
+  }
+  sopupdatingprice(stockname:string,price:number){
+const stock=this.stocks.find(stock=>stock.stockname===stockname);
+if(stock){
+
+
+  this.Updatestocksprice(stockname,price).unsubscribe();
+
+  }
+
+
+}
+
+
+}
