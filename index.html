@@ -43,3 +43,77 @@
     <button (click)="submit()" class="btn btn-primary">Submit</button>
     <button (click)="cancel()" class="btn btn-secondary">Cancel</button>
 </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Component, OnInit } from '@angular/core';
+import { StudentService } from '../student.service';
+import { Student } from '../student-form/student-form.component';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-student-list',
+  standalone: true,
+  imports: [CommonModule,ReactiveFormsModule],
+  templateUrl: './student-list.component.html',
+  styleUrl: './student-list.component.css',
+})
+export class StudentListComponent implements OnInit {
+  editmode: boolean = false;
+  editindex: number | null = null;
+  studentlist: Student[] = [];
+  form:FormGroup;
+
+  constructor(private fb:FormBuilder,private studentservice:StudentService){
+    this.form=this.fb.group({
+
+      name:['',Validators.required],
+      email:['',Validators.required],
+      phone:['',Validators.required],
+      address:['',Validators.required],
+      city:['',Validators.required],
+      state:['',Validators.required],
+
+    })
+  }
+
+  ngOnInit(): void {
+    this.getstudentlist();
+  }
+  getstudentlist() {
+    this.studentlist = this.studentservice.Students;
+  }
+  editstudent(id: number) {
+    this.editmode=true;
+    this.editindex=id;
+    this.studentservice.editStudent(id);
+
+
+  }
+  deletestudent(id: number) {
+this.studentservice.deleteStudent(id);
+
+  }
+  cancel(){}
+  submit(){}
+}
