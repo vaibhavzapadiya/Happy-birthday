@@ -1,9 +1,8 @@
 Use Case:
-When a user logs in, navigate them to:
+Build a product list page with pagination using routes like /products?page=1.
 
-/welcome if it's their first login.
-/dashboard for subsequent logins.
+Fetch and display products for the specified page.
 Key Steps:
 
-Check a flag in local storage or an API (isFirstLogin).
-Redirect to the appropriate route based on the flag.
+Read the page query parameter and dynamically load products for the given page.
+Add navigation buttons to switch pages.
