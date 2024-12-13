@@ -1,8 +1,45 @@
-Use Case:
-Build a product list page with pagination using routes like /products?page=1.
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Product, ProductService } from '../product.service';
 
-Fetch and display products for the specified page.
-Key Steps:
+@Component({
+  selector: 'app-product',
+  standalone: true,
+  imports: [CommonModule,RouterLink],
+  templateUrl: './product.component.html',
+  styleUrl: './product.component.css',
+})
+export class ProductComponent implements OnInit {
+  currentpage: number = 1;
+  totalpages: number = 1;
+  products: any[] = [];
 
-Read the page query parameter and dynamically load products for the given page.
-Add navigation buttons to switch pages.
+  constructor(
+    private route: ActivatedRoute,
+    private productService: ProductService,
+    private router: Router
+  ) {}
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      this.currentpage = params['page'];
+      console.log(params);
+      
+      console.log(this.currentpage);
+      
+      this.getproducts(this.currentpage);
+    });
+  }
+
+  getproducts(page: number) {
+      this.productService.getproducts(page).subscribe((data) => {
+        this.products = data;
+        this.totalpages = Math.ceil(data.length / 10);
+      });
+  }
+  changepage(page: number) {
+    this.router.navigate(['/product'], {
+      queryParams: { page },
+    });
+  }
+}
