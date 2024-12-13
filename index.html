@@ -1,55 +1,53 @@
-<div class="container mt-4">
-  <h2 class="text-center">Product List</h2>
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Product, ProductService } from '../product.service';
 
-  <!-- Products Table -->
-  <div class="table-responsive mt-4">
-    <table class="table table-bordered table-hover text-center">
-      <thead class="thead-dark">
-        <tr>
-          <th>Product ID</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Description</th>
-          <th>Category</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let product of products">
-          <td>{{ product.id }}</td>
-          <td>{{ product.name }}</td>
-          <td>{{ product.price | currency }}</td>
-          <td>{{ product.description }}</td>
-          <td>{{ product.category }}</td>
-        </tr>
-        <tr *ngIf="products.length === 0">
-          <td colspan="5" class="text-muted">No products available.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+@Component({
+  selector: 'app-product',
+  standalone: true,
+  imports: [CommonModule, RouterLink],
+  templateUrl: './product.component.html',
+  styleUrls: ['./product.component.css'], // Fixed typo (styleUrl -> styleUrls)
+})
+export class ProductComponent implements OnInit {
+  currentpage: number = 1; // Current page
+  totalpages: number = 1; // Total pages
+  products: Product[] = []; // Complete product list
+  paginatedProducts: Product[] = []; // Products for the current page
 
-  <!-- Pagination -->
-  <nav class="d-flex justify-content-center mt-4">
-    <ul class="pagination">
-      <li class="page-item" [class.disabled]="currentpage === 1">
-        <button class="page-link" (click)="changepage(currentpage - 1)">
-          Previous
-        </button>
-      </li>
-      <li
-        class="page-item"
-        *ngFor="let page of [].constructor(totalpages); let i = index"
-        [class.active]="currentpage === i + 1"
-      >
-        <button class="page-link" (click)="changepage(i + 1)">
-          {{ i + 1 }}
-        </button>
-      </li>
-      <li class="page-item" [class.disabled]="currentpage === totalpages">
-        <button class="page-link" (click)="changepage(currentpage + 1)">
-          Next
-        </button>
-      </li>
-    </ul>
-  </nav>
-</div>
+  constructor(
+    private route: ActivatedRoute,
+    private productService: ProductService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      this.currentpage = +params['page'] || 1; // Default to page 1 if no query param
+      this.getproducts();
+    });
+  }
+
+  getproducts(): void {
+    this.productService.getproducts().subscribe((data: Product[]) => {
+      this.products = data;
+      this.totalpages = Math.ceil(this.products.length / 10); // Calculate total pages
+      this.paginateProducts();
+    });
+  }
+
+  paginateProducts(): void {
+    const startIndex = (this.currentpage - 1) * 10;
+    const endIndex = startIndex + 10;
+    this.paginatedProducts = this.products.slice(startIndex, endIndex);
+  }
+
+  changepage(page: number): void {
+    if (page >= 1 && page <= this.totalpages) {
+      this.router.navigate(['/product'], {
+        queryParams: { page },
+      });
+    }
+  }
+}
