@@ -1,10 +1,11 @@
 Use Case:
-In an admin panel, restrict access to specific sections:
+Implement a multi-step checkout flow:
 
-/admin/users for Admin users.
-/admin/reports for Manager users.
-Redirect unauthorized users to an "Access Denied" page.
+/checkout/cart
+/checkout/shipping
+/checkout/payment
+Ensure users can’t proceed to /checkout/payment without completing /checkout/shipping.
 Key Steps:
 
-Use a route guard to check user roles dynamically.
-Configure routes based on role.
+Use route guards to enforce step validation.
+Pass data between steps using a shared service.
