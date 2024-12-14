@@ -1,53 +1,10 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Product, ProductService } from '../product.service';
+Use Case:
+In an admin panel, restrict access to specific sections:
 
-@Component({
-  selector: 'app-product',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './product.component.html',
-  styleUrls: ['./product.component.css'], // Fixed typo (styleUrl -> styleUrls)
-})
-export class ProductComponent implements OnInit {
-  currentpage: number = 1; // Current page
-  totalpages: number = 1; // Total pages
-  products: Product[] = []; // Complete product list
-  paginatedProducts: Product[] = []; // Products for the current page
+/admin/users for Admin users.
+/admin/reports for Manager users.
+Redirect unauthorized users to an "Access Denied" page.
+Key Steps:
 
-  constructor(
-    private route: ActivatedRoute,
-    private productService: ProductService,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      this.currentpage = +params['page'] || 1; // Default to page 1 if no query param
-      this.getproducts();
-    });
-  }
-
-  getproducts(): void {
-    this.productService.getproducts().subscribe((data: Product[]) => {
-      this.products = data;
-      this.totalpages = Math.ceil(this.products.length / 10); // Calculate total pages
-      this.paginateProducts();
-    });
-  }
-
-  paginateProducts(): void {
-    const startIndex = (this.currentpage - 1) * 10;
-    const endIndex = startIndex + 10;
-    this.paginatedProducts = this.products.slice(startIndex, endIndex);
-  }
-
-  changepage(page: number): void {
-    if (page >= 1 && page <= this.totalpages) {
-      this.router.navigate(['/product'], {
-        queryParams: { page },
-      });
-    }
-  }
-}
+Use a route guard to check user roles dynamically.
+Configure routes based on role.
