@@ -1,58 +1,150 @@
-<h2 class="display-4">Employee List</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Position</th>
-            <th>Joining Date</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let employee of Employees">
-            <td>{{ employee.id }}</td>
-            <td>{{ employee.name }}</td>
-            <td>{{ employee.email }}</td>
-            <td>{{ employee.phone }}</td>
-            <td>{{ employee.status }}</td>
-            <td>{{ employee.position }}</td>
-            <td>{{ employee.joiningdate }}</td>
-            <td>
-                <a routerLink="/employees/{{ employee.id }}/edit" class="btn btn-primary m-2">Edit</a>
-                <button 
-                    class="btn btn-danger m-1" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#deleteEmployeeModal" 
-                    (click)="setDeleteId(employee.id)">
-                    Delete
-                </button>
-                <a routerLink="/employees/{{ employee.id }}/personal" class="btn btn-success">View Details</a>
-            </td>
-        </tr>
-    </tbody>
-</table>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div class="container">
+    <h2 class="display-4">User Profile</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Personal Details</h5>
+                <p class="card-text" *ngFor="let user of currentuser">
+                    <strong>ID:</strong> {{user.id}}<br>
+                    <strong>Name:</strong> {{user.name}}<br>
+                    <strong>Email:</strong> {{user.email}}<br>
+                    <strong>Phone:</strong> {{user.phone}}<br>
+                    <strong>Status:</strong> {{user.status}}<br>
+                    <strong>Position:</strong> {{user.position}}<br>
+                    <strong>Joining Date:</strong> {{user.joiningdate}}<br>
+                </p>
+            </div>
+            
+        </div>
+    </div>
+    
+</div>
+</div>
+
+<div class="container" *ngFor="let user of currentuser">
+    <h3 class="display-4"> Assign Projects</h3>
+  <a routerLink="/employees/{{user.id}}/projects/assign" class="btn btn-primary" (click)="assignprojects()">Assign Projects</a>
+</div>
+
+
+<div class="modal fade" id="assignProjectModal" tabindex="-1" aria-labelledby="assignProjectModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Delete Employee</h5>
+                <h5 class="modal-title" id="assignProjectModalLabel">Assign Projects</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this employee with ID: {{ deleteId }}?
+                <span>Assign Projects</span>
             </div>
+                
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                <button class="btn btn-danger" (click)="confirmDelete()" data-bs-dismiss="modal">Yes</button>
+           
+              <button class="btn btn-primary" data-bs-dismiss="modal">Ok!!</button>
             </div>
         </div>
     </div>
+</div>  
+
+
+<div >
+    <h4>Assigned Projects</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+
+               
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let project of assignproject">
+                <td>{{ project.projectid }}</td>
+                <td>{{ project.name }}</td>
+                <td>{{ project.description }}</td>
+                <td>{{ project.startdate }}</td>
+                <td>{{ project.enddate }}</td>
+                <td>{{ project.status }}</td>
+         
+            </tr>
+    </tbody>    
+
+    </table>
 </div>
 
 <router-outlet></router-outlet>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
+import { EmployeeService } from '../Services/employee.service';
+import { Employee } from '../employee-form/employee-form.component';
+import { CommonModule } from '@angular/common';
+import { Project, ProjectService } from '../Services/project.service';
+
+@Component({
+  selector: 'app-user-profile',
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterOutlet],
+  templateUrl: './user-profile.component.html',
+  styleUrl: './user-profile.component.css'
+})
+export class UserProfileComponent implements OnInit {
+  currentid!: number;
+  currentuser: Employee[] = [];
+  isassigned: boolean = false;
+projects:Project[]=[];
+assignproject:Project[]=[];
+
+  constructor(private route: ActivatedRoute, private employeeService: EmployeeService,private projectservice:ProjectService) {
+    this.route.paramMap.subscribe((params: any) => {
+      this.currentid = params.get('id');
+      this.finduser(this.currentid);
+      console.log(this.currentid);
+    })
+
+
+  }
+  ngOnInit(): void {
+this.projects=this.projectservice.projects;
+    
+  }
+
+
+
+  finduser(id: number) {
+    if (id) {
+      this.currentuser = this.employeeService.Employeelist.filter((e) => e.id == id);
+
+    }
+
+  }
+  assignprojects(){
+    this.isassigned=true;
+
+
+  }
+}
