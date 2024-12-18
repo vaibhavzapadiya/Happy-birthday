@@ -8,53 +8,65 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './user-list.component.html',
-  styleUrl: './user-list.component.css'
+  styleUrls: ['./user-list.component.css'] // Corrected from 'styleUrl' to 'styleUrls'
 })
 export class UserListComponent {
-
   pagenumber = 1;
   pagesize = 10;
-
+  totalItems = 0;
   userlist: User[] = [];
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   ngOnInit() {
-    this.loaduserswithpage(this.pagenumber, this.pagesize)
-
-  }
-  loaduserswithpage(pagenumber: number, pagesize: number) {
-    this.userService.getuserwithpage(pagenumber, pagesize).subscribe(data => {
-      this.userlist = data
-      this.pagenumber = pagenumber;
-    
-    })
+    this.loadUsersWithPage(this.pagenumber, this.pagesize);
   }
 
-
+  loadUsersWithPage(pagenumber: number, pagesize: number) {
+    this.userService.getUsersWithPagination(pagenumber, pagesize).subscribe({
+      next: (response) => {
+        this.userlist = response.data; // Assuming response contains `data` and `totalItems`
+        this.totalItems = response.totalItems;
+        this.pagenumber = pagenumber;
+      },
+      error: (err) => {
+        console.error('Error fetching users:', err);
+      },
+    });
+  }
 
   delete(id: number) {
     if (confirm('Are you sure you want to delete this user?')) {
       this.userService.deleteUser(id).subscribe({
-
         next: () => {
-          this.loaduserswithpage(this.pagenumber, this.pagesize);
-
-        }
-      })
+          // Reload users after deletion
+          const lastPage = Math.ceil(this.totalItems / this.pagesize);
+          if (this.pagenumber > lastPage) {
+            this.pagenumber = lastPage; // Adjust to the last valid page if necessary
+          }
+          this.loadUsersWithPage(this.pagenumber, this.pagesize);
+        },
+        error: (err) => {
+          console.error('Error deleting user:', err);
+        },
+      });
     }
-
   }
 
+  loadUsersWithStatus(event: Event) {
+    const status = (event.target as HTMLSelectElement).value;
 
+    this.userService.getUsersWithPagination(this.pagenumber, this.pagesize).subscribe({
+      next: (response) => {
+        this.userlist = response.data.filter((user) => user.status === status);
+      },
+      error: (err) => {
+        console.error('Error filtering users by status:', err);
+      },
+    });
+  }
 
-  loaduserswithstatus(event: Event) {
-
-    let status = (event.target as HTMLSelectElement).value;
-
-    this.userService.getuserwithpage(this.pagenumber, this.pagesize).subscribe(data => {
-      this.userlist = data.filter(x => x.status === status);
-    })
-
+  getTotalPages(): number {
+    return Math.ceil(this.totalItems / this.pagesize);
   }
 }
