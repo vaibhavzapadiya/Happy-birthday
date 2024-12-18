@@ -1,1 +1,111 @@
-Implement an Auth Guard in Angular to protect the Admin Dashboard (/admin) and User Dashboard (/user) routes. The Admin Dashboard should be accessible only to users with the Admin role, while the User Dashboard should be accessible to any authenticated user. Redirect unauthenticated users to the login page (/login) when they try to access these protected routes.
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { User, UserService } from '../user.service';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-user-list',
+  standalone: true,
+  imports: [CommonModule,RouterLink],
+  templateUrl: './user-list.component.html',
+  styleUrl: './user-list.component.css'
+})
+export class UserListComponent {
+
+  userlist:User[]=[];
+
+  constructor(private userService:UserService) {}
+
+  ngOnInit() {
+    this.userService.getUserList().subscribe(data=>{
+      this.userlist=data;
+    })
+  }
+
+  delete(id:number){
+    this.userService.deleteUser(id);
+    this.userService.getUserList().subscribe(data=>{
+      this.userlist=data;
+    })
+
+
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  gender: string;
+  status: string;
+
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  api = 'https://gorest.co.in/public/v2/users';
+  token = 'ec7c0d32884904e952eaa7a898ed5f724c80117c1fa9927cef09a01a65a11e02'
+
+
+
+
+  constructor(private http: HttpClient) { }
+
+  addUser(data: User) {
+    console.log(data);
+
+     this.http.post<User>(this.api, data, { headers: this.getbearerToken() }).subscribe();;
+
+
+  }
+
+  getUserList(): Observable<User[]> {
+    return this.http.get<User[]>(this.api, { headers: this.getbearerToken() });
+  }
+
+  getbearerToken() {
+    return {
+      Authorization: `Bearer ${this.token}`
+    }
+  }
+  getUserbyId(id:number){
+    return this.http.get<User>(this.api+'/'+id, { headers: this.getbearerToken() });
+  }
+
+  editUser(id:number,data:User){
+    this.http.put<User>(this.api+'/'+id, data, { headers: this.getbearerToken() }).subscribe();
+
+  }
+  deleteUser(id:number){
+    console.log(id);
+    
+    this.http.delete<User>(this.api+'/'+id, { headers: this.getbearerToken() }).subscribe();
+  }
+
+}
