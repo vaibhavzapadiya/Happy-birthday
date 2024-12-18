@@ -1,3 +1,77 @@
+<div class="container col-md-12 mt-3 w-75 mx-auto bg-light p-3">
+    <h1>User List</h1>  
+<div class="">
+
+ <button  value="active" class="btn btn-secondary btn-sm m-1 sw" (click)="loaduserswithstatus($event)">Active Users</button>
+ <button value="inactive" class="btn btn-secondary btn-sm m-1" (click)="loaduserswithstatus($event)">Inactive Users</button>    
+
+</div>
+
+    <table class="table table-striped m-3 p-2 w-100">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Gender</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let user of userlist let i=index">
+
+                <td>{{i+1}}</td>
+                <td>{{user.id}}</td>
+                <td>{{user.name}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.gender}}</td>
+                <td>{{user.status}}</td>
+                <td><a class="btn btn-primary btn-sm m-1" routerLink="/edit-user/{{user.id}}">Edit</a> <a class="btn btn-danger btn-sm m-1" (click)="delete(user.id)">Delete</a></td>
+            </tr>
+        </tbody>
+    </table>    
+</div>
+<div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+        
+            <li class="page-item">
+                <a class="page-link"  (click)="loaduserswithpage(pagenumber-1,10)"  >Previous</a>
+            </li>
+           
+            <li class="page-item">
+                <a class="page-link"  (click)="loaduserswithpage(pagenumber+1,10)">Next</a>
+            </li>
+         
+        </ul>
+    </nav>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { User, UserService } from '../user.service';
@@ -6,106 +80,57 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule,RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.css'
 })
 export class UserListComponent {
 
-  userlist:User[]=[];
+  pagenumber = 1;
+  pagesize = 5;
 
-  constructor(private userService:UserService) {}
+  userlist: User[] = [];
+
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
-    this.userService.getUserList().subscribe(data=>{
-      this.userlist=data;
+ this.loaduserswithpage(this.pagenumber,this.pagesize)
+
+  }
+  loaduserswithpage(pagenumber: number, pagesize: number) {
+  this.userService.getuserwithpage(pagenumber, pagesize).subscribe(data => {
+      this.userlist = data.filter(x => x.status === 'active');
     })
   }
-
-  delete(id:number){
-    this.userService.deleteUser(id);
-    this.userService.getUserList().subscribe(data=>{
-      this.userlist=data;
+  loadusers() {
+    this.userService.getUserList().subscribe(data => {
+      this.userlist = data.filter(x => x.status === 'active');
     })
 
-
-}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  gender: string;
-  status: string;
-
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class UserService {
-  api = 'https://gorest.co.in/public/v2/users';
-  token = 'ec7c0d32884904e952eaa7a898ed5f724c80117c1fa9927cef09a01a65a11e02'
-
-
-
-
-  constructor(private http: HttpClient) { }
-
-  addUser(data: User) {
-    console.log(data);
-
-     this.http.post<User>(this.api, data, { headers: this.getbearerToken() }).subscribe();;
-
-
   }
 
-  getUserList(): Observable<User[]> {
-    return this.http.get<User[]>(this.api, { headers: this.getbearerToken() });
-  }
+  delete(id: number) {
+    if (confirm('Are you sure you want to delete this user?')) {
+      this.userService.deleteUser(id).subscribe({
 
-  getbearerToken() {
-    return {
-      Authorization: `Bearer ${this.token}`
+        next: () => {
+          this.loadusers();
+
+        }
+      })
     }
-  }
-  getUserbyId(id:number){
-    return this.http.get<User>(this.api+'/'+id, { headers: this.getbearerToken() });
-  }
-
-  editUser(id:number,data:User){
-    this.http.put<User>(this.api+'/'+id, data, { headers: this.getbearerToken() }).subscribe();
 
   }
-  deleteUser(id:number){
-    console.log(id);
-    
-    this.http.delete<User>(this.api+'/'+id, { headers: this.getbearerToken() }).subscribe();
-  }
 
+
+
+  loaduserswithstatus(event:Event){
+
+    let status=(event.target as HTMLSelectElement).value;
+
+    this.userService.getUserList().subscribe(data => {
+      this.userlist = data.filter(x => x.status === status);
+    })
+
+  }
 }
