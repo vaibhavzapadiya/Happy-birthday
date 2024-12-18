@@ -1,55 +1,3 @@
-<div class="container col-md-12 mt-3 w-75 mx-auto bg-light p-3">
-  <h1>User List</h1>
-  <div>
-    <button value="active" class="btn btn-secondary btn-sm m-1 sw" (click)="loaduserswithstatus($event)">Active Users</button>
-    <button value="inactive" class="btn btn-secondary btn-sm m-1" (click)="loaduserswithstatus($event)">Inactive Users</button>
-  </div>
-
-  <table class="table table-striped m-3 p-2 w-100">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Id</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Gender</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let user of userlist; let i = index">
-        <td>{{ i + 1 + (pagenumber - 1) * pagesize }}</td>
-        <td>{{ user.id }}</td>
-        <td>{{ user.name }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.gender }}</td>
-        <td>{{ user.status }}</td>
-        <td>
-          <a class="btn btn-primary btn-sm m-1" routerLink="/edit-user/{{ user.id }}">Edit</a>
-          <button class="btn btn-danger btn-sm m-1" (click)="delete(user.id)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div>
-  <nav aria-label="Page navigation example">
-    <ul class="pagination">
-      <li class="page-item" [class.disabled]="pagenumber <= 1">
-        <button class="page-link" (click)="loaduserswithpage(pagenumber - 1, pagesize)" [disabled]="pagenumber <= 1">Previous</button>
-      </li>
-      <li class="page-item" [class.disabled]="!hasMoreData">
-        <button class="page-link" (click)="loaduserswithpage(pagenumber + 1, pagesize)" [disabled]="!hasMoreData">Next</button>
-      </li>
-    </ul>
-  </nav>
-</div>
-
-
-
-
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { User, UserService } from '../user.service';
@@ -60,48 +8,53 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.css'],
+  styleUrl: './user-list.component.css'
 })
 export class UserListComponent {
-  pagenumber = 1;
-  pagesize = 5;
-  hasMoreData = true; // Track if more data is available
-  userlist: User[] = [];
-  statusFilter: string | null = null; // Track status filter ('active', 'inactive', or null)
 
-  constructor(private userService: UserService) {}
+  pagenumber = 1;
+  pagesize = 10;
+
+  userlist: User[] = [];
+
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
-    this.loaduserswithpage(this.pagenumber, this.pagesize);
-  }
+    this.loaduserswithpage(this.pagenumber, this.pagesize)
 
+  }
   loaduserswithpage(pagenumber: number, pagesize: number) {
     this.userService.getuserwithpage(pagenumber, pagesize).subscribe(data => {
-      this.userlist = data.users; // Assuming API response includes paginated users
-      this.hasMoreData = data.hasMoreData; // Update if more data exists
+      this.userlist = data
       this.pagenumber = pagenumber;
-    });
+    
+    })
   }
 
-  loaduserswithstatus(event: Event) {
-    const status = (event.target as HTMLButtonElement).value;
-    this.statusFilter = status;
 
-    this.userService.getuserwithstatus(status).subscribe(data => {
-      this.userlist = data.slice(0, this.pagesize); // Limit initial display
-      this.hasMoreData = data.length > this.pagesize; // Determine if more data exists
-      this.pagenumber = 1; // Reset pagination
-    });
-  }
 
   delete(id: number) {
     if (confirm('Are you sure you want to delete this user?')) {
-      this.userService.deleteUser(id).subscribe(() => {
-        // Reload users after deletion
-        this.statusFilter
-          ? this.loaduserswithstatus(new Event('click', { bubbles: true }))
-          : this.loaduserswithpage(this.pagenumber, this.pagesize);
-      });
+      this.userService.deleteUser(id).subscribe({
+
+        next: () => {
+          this.loaduserswithpage(this.pagenumber, this.pagesize);
+
+        }
+      })
     }
+
+  }
+
+
+
+  loaduserswithstatus(event: Event) {
+
+    let status = (event.target as HTMLSelectElement).value;
+
+    this.userService.getuserwithpage(this.pagenumber, this.pagesize).subscribe(data => {
+      this.userlist = data.filter(x => x.status === status);
+    })
+
   }
 }
