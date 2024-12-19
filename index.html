@@ -1,44 +1,79 @@
-<div class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded">
-    <h1 class="text-center">Product Details</h1>
-</div>
-
-<!-- Spinner for loading state -->
-<div *ngIf="isLoading" class="d-flex justify-content-center align-items-center mt-5">
-    <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
-</div>
-
-<!-- Product Card List -->
-<div *ngIf="!isLoading" class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded">
+<div class="container mt-5 d-flex justify-content-center shadow-lg p-3 mb-5 bg-white rounded">
     <div class="row">
-        <div *ngFor="let product of products" class="col-md-4 col-sm-6 col-12 mb-4">
-            <div class="card h-100 shadow-sm">
-                <img
-                    [src]="product.image"
-                    alt="product image"
-                    class="card-img-top img-fluid"
-                />
-                <div class="card-body">
-                    <h5 class="card-title font-weight-bold h4 text-center">{{ product.title }}</h5>
-                    <p class="card-text">
-                        <strong>Description:</strong> {{ product.description }}
-                    </p>
-                    <p class="card-text h5">
-                        <strong>Price:</strong> ${{ product.price }}
-                    </p>
-                    <p class="card-text">
-                        <strong>Rating:</strong> {{ product.rating.rate }} / 5
-                    </p>
-                </div>
-                <div class="card-footer text-center">
-                    <button 
-                        class="btn btn-primary" 
-                        [disabled]="product.rating.rate < 2.5">
-                        {{ product.rating.rate < 2.5 ? "Out of Stock" : "Buy Now" }}
-                    </button>
-                </div>
-            </div>
+        <div class="col-md-12">
+            <h1>Product List</h1>
         </div>
     </div>
 </div>
+
+<div *ngIf="isLoading" class="d-flex justify-content-center align-items-center mt-5">
+    <div class="spinner-border text-success" role="status">
+        <span class="sr-only"></span>
+    </div>
+</div>
+
+
+<div   class="container mt-5 d-flex justify-content-center shadow-lg p-3 mb-5 bg-white rounded">
+    <div class="w-75 mx-auto" >
+        <div class="">
+            <h2>Filters</h2>
+        </div>
+        <div >
+       
+        <label for="catagory" class="form-label">Catagory</label>
+        <select name="catagory" class="form-control" (change)="filterwithcatagory($event)" >
+            <option value="all">All</option>
+           <option *ngFor="let cats of catogory" [value]="cats">{{cats}}</option>
+        </select>
+    </div>
+    </div>
+</div>
+<div *ngIf="!isLoading" class="container mt-5 d-flex justify-content-center shadow-lg p-3 mb-5 bg-white rounded">
+
+
+    <div class="card-container row p-2">
+        <ng-container *ngFor="
+        let product of products
+          | paginate : { itemsPerPage: 10, currentPage: p }
+      " class="shadow-lg p-3 mb-5 bg-white rounded col-md-4 col-sm-6 col-xs-12">
+            <a class="card m-2 p-2">
+                <div class="card-body m-2 p-8">
+                    <h5 class="card-title font-weight-bold h2">
+                        <strong>{{ product.title }}</strong>
+                    </h5>
+
+                    <p class="">
+                        <strong>Description:</strong> {{ product.description }}
+                    </p>
+                    <p class="card-text size-medium h4" [ngClass]="product.price < 50 ? 'text-success' : ''">
+                        <strong>Price:</strong> ${{ product.price }}
+                    </p>
+                    <img src="{{ product.image }}" alt="product image"
+                        class="card-img-top img-fluid mx-auto d-block mb-2 mt-2" />
+
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a routerLink="/productdetails/{{ product.id }}">
+                                    <button class="btn btn-info">Details</button>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-primary" [disabled]="product.rating.rate < 2.5">
+                                    {{
+                                    product.rating.rate < 2.5 ? "Out of stock" : "Add to Cart" }} </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </ng-container>
+    </div>
+
+   <div class="row justify-content-center">
+    <pagination-controls (pageChange)="p = $event" class="pagination-controls"></pagination-controls>
+   </div>
+</div>
+
+
+<router-outlet></router-outlet>
