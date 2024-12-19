@@ -1,32 +1,38 @@
-<div class="container mt-5 d-flex ">
-    <div class="row justify-content-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="20" fill="currentColor"
-            class="bi bi-arrow-return-left" viewBox="0 0 16 16" routerLink="/productlist">
-            <path fill-rule="evenodd"
-                d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5" />
-        </svg>
-
+<!-- Back Button -->
+<div class="container mt-5">
+    <div class="row justify-content-start">
+        <div class="col-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="20" fill="currentColor"
+                class="bi bi-arrow-return-left" viewBox="0 0 16 16" routerLink="/productlist" style="cursor: pointer;">
+                <path fill-rule="evenodd"
+                    d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5" />
+            </svg>
+        </div>
     </div>
 </div>
 
+<!-- Product Details Header -->
 <div class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded">
     <h1 class="text-center">Product Details</h1>
 </div>
 
-<!-- Spinner for loading state -->
+<!-- Spinner for Loading State -->
 <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center mt-5">
     <div class="spinner-border text-success" role="status">
-        <span class="sr-only"></span>
+        <span class="sr-only">Loading...</span>
     </div>
 </div>
 
-<!-- Product Card List -->
-<div *ngIf="!isLoading" class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded ">
+<!-- Product Details -->
+<div *ngIf="!isLoading" class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded">
     <div class="row">
-        <div *ngFor="let product of products" class="col-md-4 col-sm-6 col-12 mb-4">
+        <div *ngFor="let product of products" class="col-lg-4 col-md-6 col-sm-12 mb-4">
             <div class="card h-100 shadow-sm">
-                <img [src]="product.image" alt="product image" class="card-img-top img-fluid" />
-                <div class="card-body" *ngFor="let product of products">
+                <!-- Product Image -->
+                <img [src]="product.image" alt="Product Image" class="card-img-top img-fluid mx-auto d-block">
+
+                <!-- Product Details -->
+                <div class="card-body">
                     <h5 class="card-title font-weight-bold h4 text-center">{{ product.title }}</h5>
                     <p class="card-text">
                         <strong>Description:</strong> {{ product.description }}
@@ -38,9 +44,12 @@
                         <strong>Rating:</strong> {{ product.rating.rate }} / 5
                     </p>
                 </div>
+
+                <!-- Action Buttons -->
                 <div class="card-footer text-center">
                     <button class="btn btn-primary" [disabled]="product.rating.rate < 2.5">
-                        {{ product.rating.rate < 2.5 ? "Out of Stock" : "Buy Now" }} </button>
+                        {{ product.rating.rate < 2.5 ? "Out of Stock" : "Buy Now" }}
+                    </button>
                 </div>
             </div>
         </div>
