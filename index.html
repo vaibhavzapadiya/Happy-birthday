@@ -1,71 +1,48 @@
-<div class="container mt-5 p-3 shadow-lg bg-white rounded">
+<div class="container mt-5 d-flex ">
     <div class="row justify-content-center">
-        <div class="col-md-12 text-center">
-            <h1>Product List</h1>
-        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="20" fill="currentColor"
+            class="bi bi-arrow-return-left" viewBox="0 0 16 16" routerLink="/productlist">
+            <path fill-rule="evenodd"
+                d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5" />
+        </svg>
+
     </div>
 </div>
 
+<div class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded">
+    <h1 class="text-center">Product Details</h1>
+</div>
+
+<!-- Spinner for loading state -->
 <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center mt-5">
     <div class="spinner-border text-success" role="status">
-        <span class="sr-only">Loading...</span>
+        <span class="sr-only"></span>
     </div>
 </div>
 
-<div class="container mt-5 p-3 shadow-lg bg-white rounded">
+<!-- Product Card List -->
+<div *ngIf="!isLoading" class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded ">
     <div class="row">
-        <div class="col-md-12">
-            <h2>Filters</h2>
-        </div>
-        <div class="col-md-6">
-            <label for="category" class="form-label">Category</label>
-            <select id="category" class="form-select" (change)="filterwithcategory($event)">
-                <option value="all">All</option>
-                <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
-            </select>
-        </div>
-    </div>
-</div>
-
-<div *ngIf="!isLoading" class="container mt-5 p-3 shadow-lg bg-white rounded">
-    <div class="row">
-        <ng-container *ngFor="let product of products | paginate : { itemsPerPage: 10, currentPage: p }">
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img [src]="product.image" alt="product image" class="card-img-top img-fluid mx-auto d-block">
-                    <div class="card-body">
-                        <h5 class="card-title font-weight-bold">{{ product.title }}</h5>
-                        <p class="card-text">
-                            <strong>Description:</strong> {{ product.description }}
-                        </p>
-                        <p class="card-text h5" [ngClass]="product.price < 50 ? 'text-success' : ''">
-                            <strong>Price:</strong> ${{ product.price }}
-                        </p>
-                    </div>
-                    <div class="card-footer bg-light">
-                        <div class="row">
-                            <div class="col-6 text-center">
-                                <a [routerLink]="'/productdetails/' + product.id">
-                                    <button class="btn btn-info w-100">Details</button>
-                                </a>
-                            </div>
-                            <div class="col-6 text-center">
-                                <button class="btn btn-primary w-100" [disabled]="product.rating.rate < 2.5">
-                                    {{ product.rating.rate < 2.5 ? "Out of stock" : "Add to Cart" }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+        <div *ngFor="let product of products" class="col-md-4 col-sm-6 col-12 mb-4">
+            <div class="card h-100 shadow-sm">
+                <img [src]="product.image" alt="product image" class="card-img-top img-fluid" />
+                <div class="card-body" *ngFor="let product of products">
+                    <h5 class="card-title font-weight-bold h4 text-center">{{ product.title }}</h5>
+                    <p class="card-text">
+                        <strong>Description:</strong> {{ product.description }}
+                    </p>
+                    <p class="card-text h5">
+                        <strong>Price:</strong> ${{ product.price }}
+                    </p>
+                    <p class="card-text">
+                        <strong>Rating:</strong> {{ product.rating.rate }} / 5
+                    </p>
+                </div>
+                <div class="card-footer text-center">
+                    <button class="btn btn-primary" [disabled]="product.rating.rate < 2.5">
+                        {{ product.rating.rate < 2.5 ? "Out of Stock" : "Buy Now" }} </button>
                 </div>
             </div>
-        </ng-container>
-    </div>
-
-    <div class="row justify-content-center">
-        <div class="col-auto">
-            <pagination-controls (pageChange)="p = $event"></pagination-controls>
         </div>
     </div>
 </div>
-
-<router-outlet></router-outlet>
