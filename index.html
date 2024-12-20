@@ -1,89 +1,43 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { User, UserService } from '../Services/user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+submit() {
+  if (this.userForm.valid) {
+    if (this.editemode && this.editindex !== null) {
+      if (this.userForm.value.status === 'active') {
+        // Count active users on the current page only
+        const activeUserCount = this.userlist.filter(user => user.status === 'active').length;
 
-@Component({
-  selector: 'app-user-form',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './user-form.component.html',
-  styleUrl: './user-form.component.css'
-})
-export class UserFormComponent {
-  userlist: User[] = [];
-  userForm: FormGroup;
-  editemode!: boolean;
-  errmsg: string = '';
-  editindex: number | null = null;
-  constructor(private fb: FormBuilder, private userservice: UserService, private router: Router, private route: ActivatedRoute) {
-    this.userForm = this.fb.group({
-      name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      gender: ['', [Validators.required]],
-      status: ['inactive', [Validators.required]]
-    })
-    this.route.params.subscribe(params => {
-      let id = parseInt(params['id']);
-      if (id) {
-        this.editemode = true;
-        this.editindex = id;
-        this.userservice.getuserbyid(id).subscribe(data => {
-          this.userForm.patchValue(data);
-        })
-      }
-      else {
-        this.editemode = false;
-      }
-    })
-  }
-
-
-  submit() {
-
-    if (this.userForm.valid) {
-      if (this.editemode && this.editindex !== null) {
-
-        if (this.userForm.value.status == 'active') {
-          this.userservice.getusers().subscribe(obs => {
-            this.userlist = obs.filter(x => x.status == 'active');
-            console.log(this.userlist);
-            
-            if (this.userlist.length > 10) {
-              this.errmsg = 'You can not add more than 10 active users';
-            }
-          })
+        if (activeUserCount >= 10) {
+          this.errmsg = 'You cannot have more than 10 active users on this page.';
+          return;
         }
-        else {
-          this.userservice.edituser(this.editindex, this.userForm.value).subscribe(x => {
-            this.userservice.getusers().subscribe(() => {
-              this.router.navigate(['user-list']);
-            })
+      }
 
-          });
+      // Proceed with editing the user
+      this.userservice.edituser(this.editindex, this.userForm.value).subscribe(() => {
+        // Update the local list and reset edit mode
+        const userIndex = this.userlist.findIndex(user => user.id === this.editindex);
+        if (userIndex !== -1) {
+          this.userlist[userIndex] = { ...this.userlist[userIndex], ...this.userForm.value };
         }
+        this.errmsg = ''; // Clear any error messages
+      });
+    } else {
+      if (this.userForm.value.status === 'active') {
+        // Count active users on the current page only
+        const activeUserCount = this.userlist.filter(user => user.status === 'active').length;
 
-
+        if (activeUserCount >= 10) {
+          this.errmsg = 'You cannot have more than 10 active users on this page.';
+          return;
+        }
       }
-      else {
-        this.userservice.adduser(this.userForm.value).subscribe(() => {
-          this.userservice.getusers().subscribe(() => {
-            this.router.navigate(['user-list']);
-          })
-        });
 
-      }
+      // Proceed with adding the user
+      this.userservice.adduser(this.userForm.value).subscribe(newUser => {
+        this.userlist.push(newUser); // Add the new user to the local list
+        this.errmsg = ''; // Clear any error messages
+      });
     }
-    else {
-      this.errmsg = 'Please fill all the fields';
-    }
+  } else {
+    this.errmsg = 'Please fill all the fields';
   }
-
-  cancel() {
-    this.editemode = false;
-    this.editindex = null;
-    this.router.navigate(['user-list']);
-  }
-
 }
