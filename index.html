@@ -2,125 +2,68 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../Services/user.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './user-form.component.html',
   styleUrl: './user-form.component.css'
 })
 export class UserFormComponent {
 
-  userForm:FormGroup;
-  editemode!:boolean;
-  errmsg:string='';
-  constructor(private fb:FormBuilder,private userservice:UserService,private router:Router){
-    this.userForm=this.fb.group({
-      name:['',[Validators.required]],
-      email:['',[Validators.required,Validators.email]],
-      gender:['',[Validators.required]],
-      status:['inactive',[Validators.required]]
+  userForm: FormGroup;
+  editemode!: boolean;
+  errmsg: string = '';
+  editindex: number | null = null;
+  constructor(private fb: FormBuilder, private userservice: UserService, private router: Router, private route: ActivatedRoute) {
+    this.userForm = this.fb.group({
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      gender: ['', [Validators.required]],
+      status: ['inactive', [Validators.required]]
     })
-    
-  }
-
-
-  submit(){
-
-    if(this.userForm.valid){
-      this.userservice.adduser(this.userForm.value);
-      this.router.navigate(['user-list']);
-    }
-    else{
-      this.errmsg='Please fill all the fields';
-    }
-  }
-
-  cancel(){}
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { User, UserService } from '../Services/user.service';
-
-@Component({
-  selector: 'app-user-list',
-  standalone: true,
-  imports: [CommonModule,RouterLink],
-  templateUrl: './user-list.component.html',
-  styleUrl: './user-list.component.css'
-})
-export class UserListComponent {
-  userlist:User[]=[];
-
-
-  constructor(private userService:UserService) {}
-
-  ngOnInit(): void {
-    this.userService.getusers().subscribe({
-      next: (data) => {
-        this.userlist = data;
-      },
+    this.route.params.subscribe(params => {
+      let id = parseInt(params['id']);
+      if (id) {
+        this.editemode = true;
+        this.editindex = id;
+        this.userservice.getuserbyid(id).subscribe(data => {
+          this.userForm.patchValue(data);
+        })
+      }
+      else {
+        this.editemode = false;
+      }
     })
   }
 
-}
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  gender: string;
-  status: string;
+  submit() {
 
-}
+    if (this.userForm.valid) {
+      if (this.editemode && this.editindex !== null) {
+        this.userservice.edituser(this.editindex, this.userForm.value).subscribe(x=>{
+          this.userservice.getusers().subscribe()
+        });
+        this.router.navigate(['user-list']);
+      }
+      else {
+        this.userservice.adduser(this.userForm.value).subscribe();
+        this.router.navigate(['user-list']);
 
-@Injectable({
-  providedIn: 'root'
-})
-export class UserService {
-  api='https://gorest.co.in/public/v2/users'
-
-  token='ec7c0d32884904e952eaa7a898ed5f724c80117c1fa9927cef09a01a65a11e02';
-
-  constructor(private http: HttpClient) { }
-
-
-  getusers():Observable<User[]>{
-    return this.http.get<User[]>(this.api,{headers:this.getbearerToken()});
-  }
-
-  adduser(data:User){
-     this.http.post<User>(this.api,data,{headers:this.getbearerToken()}).subscribe();
-  }
-
-
-
-
-  getbearerToken() {
-    return {
-      Authorization: `Bearer ${this.token}`
+      }
     }
+    else {
+      this.errmsg = 'Please fill all the fields';
+    }
+  }
 
+  cancel() { 
+    this.editemode = false;
+    this.editindex = null;
+    this.router.navigate(['user-list']);
   }
 
 }
