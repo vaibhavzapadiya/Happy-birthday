@@ -1,57 +1,126 @@
-<!-- Back Button -->
-<div class="container mt-5">
-    <div class="row justify-content-start">
-        <div class="col-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="20" fill="currentColor"
-                class="bi bi-arrow-return-left" viewBox="0 0 16 16" routerLink="/productlist" style="cursor: pointer;">
-                <path fill-rule="evenodd"
-                    d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5" />
-            </svg>
-        </div>
-    </div>
-</div>
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { UserService } from '../Services/user.service';
+import { Router } from '@angular/router';
 
-<!-- Product Details Header -->
-<div class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded">
-    <h1 class="text-center">Product Details</h1>
-</div>
+@Component({
+  selector: 'app-user-form',
+  standalone: true,
+  imports: [ReactiveFormsModule,CommonModule],
+  templateUrl: './user-form.component.html',
+  styleUrl: './user-form.component.css'
+})
+export class UserFormComponent {
 
-<!-- Spinner for Loading State -->
-<div *ngIf="isLoading" class="d-flex justify-content-center align-items-center mt-5">
-    <div class="spinner-border text-success" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
-</div>
+  userForm:FormGroup;
+  editemode!:boolean;
+  errmsg:string='';
+  constructor(private fb:FormBuilder,private userservice:UserService,private router:Router){
+    this.userForm=this.fb.group({
+      name:['',[Validators.required]],
+      email:['',[Validators.required,Validators.email]],
+      gender:['',[Validators.required]],
+      status:['inactive',[Validators.required]]
+    })
+    
+  }
 
-<!-- Product Details -->
-<div *ngIf="!isLoading" class="container mt-5 shadow-lg p-3 mb-5 bg-white rounded">
-    <div class="row">
-        <div *ngFor="let product of products" class="col-lg-4 col-md-6 col-sm-12 mb-4">
-            <div class="card h-100 shadow-sm">
-                <!-- Product Image -->
-                <img [src]="product.image" alt="Product Image" class="card-img-top img-fluid mx-auto d-block">
 
-                <!-- Product Details -->
-                <div class="card-body">
-                    <h5 class="card-title font-weight-bold h4 text-center">{{ product.title }}</h5>
-                    <p class="card-text">
-                        <strong>Description:</strong> {{ product.description }}
-                    </p>
-                    <p class="card-text h5">
-                        <strong>Price:</strong> ${{ product.price }}
-                    </p>
-                    <p class="card-text">
-                        <strong>Rating:</strong> {{ product.rating.rate }} / 5
-                    </p>
-                </div>
+  submit(){
 
-                <!-- Action Buttons -->
-                <div class="card-footer text-center">
-                    <button class="btn btn-primary" [disabled]="product.rating.rate < 2.5">
-                        {{ product.rating.rate < 2.5 ? "Out of Stock" : "Buy Now" }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    if(this.userForm.valid){
+      this.userservice.adduser(this.userForm.value);
+      this.router.navigate(['user-list']);
+    }
+    else{
+      this.errmsg='Please fill all the fields';
+    }
+  }
+
+  cancel(){}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { User, UserService } from '../Services/user.service';
+
+@Component({
+  selector: 'app-user-list',
+  standalone: true,
+  imports: [CommonModule,RouterLink],
+  templateUrl: './user-list.component.html',
+  styleUrl: './user-list.component.css'
+})
+export class UserListComponent {
+  userlist:User[]=[];
+
+
+  constructor(private userService:UserService) {}
+
+  ngOnInit(): void {
+    this.userService.getusers().subscribe({
+      next: (data) => {
+        this.userlist = data;
+      },
+    })
+  }
+
+}
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  gender: string;
+  status: string;
+
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  api='https://gorest.co.in/public/v2/users'
+
+  token='ec7c0d32884904e952eaa7a898ed5f724c80117c1fa9927cef09a01a65a11e02';
+
+  constructor(private http: HttpClient) { }
+
+
+  getusers():Observable<User[]>{
+    return this.http.get<User[]>(this.api,{headers:this.getbearerToken()});
+  }
+
+  adduser(data:User){
+     this.http.post<User>(this.api,data,{headers:this.getbearerToken()}).subscribe();
+  }
+
+
+
+
+  getbearerToken() {
+    return {
+      Authorization: `Bearer ${this.token}`
+    }
+
+  }
+
+}
