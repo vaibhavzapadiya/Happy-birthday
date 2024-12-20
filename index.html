@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { UserService } from '../Services/user.service';
+import { User, UserService } from '../Services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './user-form.component.css'
 })
 export class UserFormComponent {
-
+  userlist: User[] = [];
   userForm: FormGroup;
   editemode!: boolean;
   errmsg: string = '';
@@ -44,14 +44,34 @@ export class UserFormComponent {
 
     if (this.userForm.valid) {
       if (this.editemode && this.editindex !== null) {
-        this.userservice.edituser(this.editindex, this.userForm.value).subscribe(x=>{
-          this.userservice.getusers().subscribe()
-        });
-        this.router.navigate(['user-list']);
+
+        if (this.userForm.value.status == 'active') {
+          this.userservice.getusers().subscribe(obs => {
+            this.userlist = obs.filter(x => x.status == 'active');
+            console.log(this.userlist);
+            
+            if (this.userlist.length > 10) {
+              this.errmsg = 'You can not add more than 10 active users';
+            }
+          })
+        }
+        else {
+          this.userservice.edituser(this.editindex, this.userForm.value).subscribe(x => {
+            this.userservice.getusers().subscribe(() => {
+              this.router.navigate(['user-list']);
+            })
+
+          });
+        }
+
+
       }
       else {
-        this.userservice.adduser(this.userForm.value).subscribe();
-        this.router.navigate(['user-list']);
+        this.userservice.adduser(this.userForm.value).subscribe(() => {
+          this.userservice.getusers().subscribe(() => {
+            this.router.navigate(['user-list']);
+          })
+        });
 
       }
     }
@@ -60,7 +80,7 @@ export class UserFormComponent {
     }
   }
 
-  cancel() { 
+  cancel() {
     this.editemode = false;
     this.editindex = null;
     this.router.navigate(['user-list']);
