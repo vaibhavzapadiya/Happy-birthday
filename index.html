@@ -1,72 +1,19 @@
-<div>
-    <div class="container col-md-12 mt-4 p-3 mx-auto bg-light p-3 shadow-lg text-dark">
-        <h1 class="text-center display-4">{{editemode?'Edit':'Add'}} User</h1>
-    </div>
-    <div class="container col-md-12 mt-3 mx-auto bg-light p-3 shadow-lg text-dark">
-        <form [formGroup]="userForm" class="form-group">
-            <div>
-                <label for="name">Name</label>
-                <input type="text" class="form-control" formControlName="name" id="name" />
-                <span class="err-msg"
-                    *ngIf="userForm.get('name')?.errors?.['required'] && userForm.get('name')?.touched">Name is
-                    required</span>
-            </div>
-
-            <div>
-                <label for="email">Email</label>
-                <input type="email" class="form-control" formControlName="email" id="email" />
-                <span class="err-msg"
-                    *ngIf="userForm.get('email')?.errors?.['required'] && userForm.get('email')?.touched">Email is
-                    required and should be valid</span>
-            </div>
-
-            <div>
-                <label for="gender">Gender</label>
-                <select name="gender" id="gender" class="form-control" formControlName="gender">
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <span class="err-msg"
-                    *ngIf="userForm.get('gender')?.errors?.['required'] && userForm.get('gender')?.touched">Gender is
-                    required</span>
-            </div>
-
-            <div >
-                <label for="status">status</label>
-                <select name="status" id="status" class="form-control" formControlName="status" >
-                    <option value="active" *ngIf="editemode">Active</option>
-                    <option value="inactive" >Inactive</option>
-                </select>
-                <span class="err-msg"
-                    *ngIf="userForm.get('status')?.errors?.['required'] && userForm.get('status')?.touched">Status is
-                    required</span>
-            </div>
-
-            <div>
-                <button type="submit" class="btn btn-primary m-2" (click)="submit()">
-                    {{ editemode ? "Update" : "Add" }}
-                </button>
-                <button class="btn btn-danger m-1" (click)="cancel()" *ngIf="editemode">
-                    Cancel
-                </button>
-            </div>
-        </form>
-        <p class="err-msg">{{ errmsg }}</p>
-    </div>
-    
-<div *ngIf="istoaster" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-     
-      <strong class="me-auto">Add-user</strong>
-      <small>{{ istoaster ? 'success' : 'error' }}</small>
-     
-    </div>
-    <div class="toast-body">
-      User added successfully
-    </div>
-    <button type="button" class="btn btn-primary" routerLink="/user-list" >Ok!!</button>
+<div
+  *ngIf="istoaster"
+  class="toast show position-absolute top-50 start-50 translate-middle"
+  role="alert"
+  aria-live="assertive"
+  aria-atomic="true"
+  style="z-index: 1055; min-width: 300px;"
+>
+  <div class="toast-header">
+    <strong class="me-auto">Add-user</strong>
+    <small>{{ istoaster ? 'success' : 'error' }}</small>
   </div>
+  <div class="toast-body text-center">
+    User added successfully
+  </div>
+  <button type="button" class="btn btn-primary mt-3" routerLink="/user-list">
+    Ok!!
+  </button>
 </div>
-
-
-
