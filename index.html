@@ -1,19 +1,53 @@
-<div
-  *ngIf="istoaster"
-  class="toast show position-absolute top-50 start-50 translate-middle"
-  role="alert"
-  aria-live="assertive"
-  aria-atomic="true"
-  style="z-index: 1055; min-width: 300px;"
->
-  <div class="toast-header">
-    <strong class="me-auto">Add-user</strong>
-    <small>{{ istoaster ? 'success' : 'error' }}</small>
-  </div>
-  <div class="toast-body text-center">
-    User added successfully
-  </div>
-  <button type="button" class="btn btn-primary mt-3" routerLink="/user-list">
-    Ok!!
-  </button>
-</div>
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TaskService } from '../task.service';
+
+@Component({
+  selector: 'app-task-form',
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './task-form.component.html',
+  styleUrls: ['./task-form.component.css'],
+})
+export class TaskFormComponent {
+  tasklist: any[] = [];
+  form: FormGroup;
+  errmsg!: string;
+
+  constructor(private fb: FormBuilder, private taskService: TaskService) {
+    this.form = this.fb.group({
+      taskName: ['', [Validators.required, Validators.minLength(3)]],
+      dueDate: ['', [Validators.required]],
+      priority: ['', [Validators.required]],
+      subtasks: this.fb.array([]),
+    });
+  }
+
+  get subtasks() {
+    return this.form.get('subtasks') as FormArray;
+  }
+
+  addSubtask() {
+    this.subtasks.push(
+      this.fb.group({
+        subtaskName: ['', [Validators.required, Validators.minLength(3)]],
+        subtaskStatus: [false],
+      })
+    );
+  }
+
+  removeSubtask(index: number) {
+    this.subtasks.removeAt(index);
+  }
+
+  submit() {
+    if (this.form.valid) {
+      console.log(this.form.value);
+      this.tasklist.push(this.form.value);
+      this.errmsg = ''; // Clear error message on successful submission
+    } else {
+      this.errmsg = 'All fields are required';
+    }
+  }
+}
