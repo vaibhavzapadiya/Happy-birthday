@@ -1,22 +1,53 @@
-tasklist: any[] = [];
-  taskToEdit: any = null; // Holds the task being edited
+form: FormGroup;
+  isEditMode: boolean = false;
 
-  addTask(task: any) {
-    this.tasklist.push(task);
+  constructor(private fb: FormBuilder, private productService: ProductService) {
+    this.form = this.fb.group({
+      productName: ['', [Validators.required, Validators.minLength(3)]],
+      price: ['', [Validators.required, Validators.min(0.01)]],
+      category: ['', Validators.required],
+      features: this.fb.array([]), // For product-specific features or specifications
+    });
   }
 
-  editTask(task: any) {
-    this.taskToEdit = task;
-  }
-
-  updateTask(updatedTask: any) {
-    const index = this.tasklist.findIndex((task) => task === this.taskToEdit);
-    if (index !== -1) {
-      this.tasklist[index] = updatedTask;
+  ngOnInit() {
+    if (this.productService.productToEdit) {
+      this.isEditMode = true;
+      this.form.patchValue(this.productService.productToEdit);
+      const featuresArray = this.fb.array([]);
+      for (let feature of this.productService.productToEdit.features) {
+        featuresArray.push(this.fb.group(feature));
+      }
+      this.form.setControl('features', featuresArray);
     }
-    this.taskToEdit = null;
   }
 
-  deleteTask(index: number) {
-    this.tasklist.splice(index, 1);
+  get features(): FormArray {
+    return this.form.get('features') as FormArray;
   }
+
+  addFeature() {
+    this.features.push(
+      this.fb.group({
+        featureName: ['', [Validators.required, Validators.minLength(3)]],
+        featureValue: ['', Validators.required],
+      })
+    );
+  }
+
+  removeFeature(index: number) {
+    this.features.removeAt(index);
+  }
+
+  submit() {
+    if (this.form.valid) {
+      if (this.isEditMode) {
+        this.productService.updateProduct(this.form.value);
+      } else {
+        this.productService.addProduct(this.form.value);
+      }
+      this.form.reset();
+      this.isEditMode = false;
+    }
+  }
+}
