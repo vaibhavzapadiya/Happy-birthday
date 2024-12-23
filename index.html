@@ -1,42 +1,234 @@
-<div formArrayName="subtasks">
-  <div *ngFor="let subtask of subtasks.controls; let i = index" [formGroupName]="i">
-    <label for="{{ 'subtaskName' + i }}">Subtask Name</label>
-    <input
-      type="text"
-      class="form-control"
-      id="{{ 'subtaskName' + i }}"
-      formControlName="subtaskName"
-    >
-    <!-- Error Handling -->
-    <span
-      *ngIf="subtask.get('subtaskName')?.errors?.['required'] && subtask.get('subtaskName')?.touched"
-      class="errmsg"
-      id="subtaskNameError-{{i}}"
-    >
-      Subtask Name is required.
-    </span>
-    <span
-      *ngIf="subtask.get('subtaskName')?.errors?.['minlength'] && subtask.get('subtaskName')?.touched"
-      class="errmsg"
-      id="subtaskNameError-{{i}}"
-    >
-      Subtask Name must be at least 3 characters.
-    </span>
+import { Component } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-    <label for="{{ 'subtaskStatus' + i }}">Subtask Status</label>
-    <input
-      type="checkbox"
-      class="form-check-input"
-      id="{{ 'subtaskStatus' + i }}"
-      formControlName="subtaskStatus"
-    ><br>
-    <button
-      type="button"
-      (click)="removeSubtask(i)"
-      class="btn btn-danger"
-      id="removesubtaskName-{{i}}"
-    >
-      Remove Subtask
-    </button>
-  </div>
-</div>
+// Custom Validator for Past Dates
+import { AbstractControl, ValidatorFn } from '@angular/forms';
+export function futureDateValidator(): ValidatorFn {
+  return (control: AbstractControl) => {
+    const inputDate = new Date(control.value);
+    const today = new Date();
+    if (inputDate < today) {
+      return { pastDate: true };
+    }
+    return null;
+  };
+}
+
+@Component({
+  selector: 'app-task-form',
+  template: `
+    <div class="container mt-5 p-3 shadow-lg rounded">
+      <h3 class="display-4 text-center">Create Task</h3>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <!-- Task Name -->
+        <div>
+          <label for="taskName">Task Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="taskName"
+            formControlName="taskName"
+          />
+          <span
+            *ngIf="form.get('taskName')?.errors?.['required'] && form.get('taskName')?.touched"
+            class="errmsg"
+            id="taskNameError"
+          >
+            Task Name is required.
+          </span>
+          <span
+            *ngIf="form.get('taskName')?.errors?.['minlength'] && form.get('taskName')?.touched"
+            class="errmsg"
+            id="taskNameError"
+          >
+            Task Name must be at least 3 characters long.
+          </span>
+        </div>
+
+        <!-- Due Date -->
+        <div>
+          <label for="dueDate">Due Date</label>
+          <input
+            type="date"
+            class="form-control"
+            id="dueDate"
+            formControlName="dueDate"
+          />
+          <span
+            *ngIf="form.get('dueDate')?.errors?.['required'] && form.get('dueDate')?.touched"
+            class="errmsg"
+            id="dueDateError"
+          >
+            Due Date is required.
+          </span>
+          <span
+            *ngIf="form.get('dueDate')?.errors?.['pastDate'] && form.get('dueDate')?.touched"
+            class="errmsg"
+            id="dueDateError"
+          >
+            Due Date cannot be in the past.
+          </span>
+        </div>
+
+        <!-- Priority -->
+        <div>
+          <label for="priority">Priority</label>
+          <select
+            class="form-control"
+            id="priority"
+            formControlName="priority"
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+          <span
+            *ngIf="form.get('priority')?.errors?.['required'] && form.get('priority')?.touched"
+            class="errmsg"
+            id="priorityError"
+          >
+            Priority is required.
+          </span>
+        </div>
+
+        <!-- Subtasks -->
+        <div formArrayName="subtasks">
+          <div
+            *ngFor="let subtask of subtasks.controls; let i = index"
+            [formGroupName]="i"
+          >
+            <label for="subtaskName-{{ i }}">Subtask Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="subtaskName-{{ i }}"
+              formControlName="subtaskName"
+            />
+            <span
+              *ngIf="subtask.get('subtaskName')?.errors?.['required'] && subtask.get('subtaskName')?.touched"
+              class="errmsg"
+              id="subtaskNameError-{{ i }}"
+            >
+              Subtask Name is required.
+            </span>
+            <span
+              *ngIf="subtask.get('subtaskName')?.errors?.['minlength'] && subtask.get('subtaskName')?.touched"
+              class="errmsg"
+              id="subtaskNameError-{{ i }}"
+            >
+              Subtask Name must be at least 3 characters long.
+            </span>
+            <label for="subtaskStatus-{{ i }}">Subtask Status</label>
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="subtaskStatus-{{ i }}"
+              formControlName="subtaskStatus"
+            />
+            <button
+              type="button"
+              class="btn btn-danger mt-2"
+              (click)="removeSubtask(i)"
+            >
+              Remove Subtask
+            </button>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-primary mt-3"
+          (click)="addSubtask()"
+        >
+          Add Subtask
+        </button>
+
+        <!-- Submit Button -->
+        <button
+          class="btn btn-success mt-3"
+          type="submit"
+        >
+          Submit
+        </button>
+      </form>
+
+      <!-- Error Message -->
+      <div *ngIf="errmsg" class="errmsg mt-3">{{ errmsg }}</div>
+
+      <!-- Task List -->
+      <div class="mt-5">
+        <h4>Task List:</h4>
+        <div
+          *ngFor="let task of tasklist; let i = index"
+          [class.priority-low]="task.priority === 'Low'"
+          [class.priority-high]="task.priority === 'High'"
+          id="id-{{ i }}"
+          class="p-2 mb-2"
+        >
+          <strong>{{ task.taskName }}</strong> ({{ task.priority }})
+          <ul>
+            <li *ngFor="let subtask of task.subtasks">
+              {{ subtask.subtaskName }} - {{ subtask.subtaskStatus ? 'Done' : 'Pending' }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [
+    `
+      .errmsg {
+        color: red;
+        font-size: 0.9rem;
+      }
+      .priority-low {
+        background-color: #d4edda;
+      }
+      .priority-high {
+        background-color: #f8d7da;
+      }
+    `,
+  ],
+})
+export class TaskFormComponent {
+  form: FormGroup;
+  tasklist: any[] = [];
+  errmsg: string = '';
+
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      taskName: ['', [Validators.required, Validators.minLength(3)]],
+      dueDate: ['', [Validators.required, futureDateValidator()]],
+      priority: ['', Validators.required],
+      subtasks: this.fb.array([]),
+    });
+  }
+
+  get subtasks(): FormArray {
+    return this.form.get('subtasks') as FormArray;
+  }
+
+  addSubtask() {
+    this.subtasks.push(
+      this.fb.group({
+        subtaskName: ['', [Validators.required, Validators.minLength(3)]],
+        subtaskStatus: [false],
+      })
+    );
+  }
+
+  removeSubtask(index: number) {
+    this.subtasks.removeAt(index);
+  }
+
+  submit() {
+    if (this.form.valid) {
+      this.tasklist.push(this.form.value);
+      this.form.reset();
+      this.subtasks.clear();
+      this.errmsg = '';
+    } else {
+      this.errmsg = 'Please correct the errors and try again.';
+      this.form.markAllAsTouched();
+    }
+  }
+}
