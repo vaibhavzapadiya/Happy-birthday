@@ -1,53 +1,64 @@
 form: FormGroup;
   isEditMode: boolean = false;
 
-  constructor(private fb: FormBuilder, private productService: ProductService) {
+  constructor(private fb: FormBuilder, private taskService: TaskService) {
     this.form = this.fb.group({
-      productName: ['', [Validators.required, Validators.minLength(3)]],
-      price: ['', [Validators.required, Validators.min(0.01)]],
-      category: ['', Validators.required],
-      features: this.fb.array([]), // For product-specific features or specifications
+      taskName: ['', [Validators.required, Validators.minLength(3)]],
+      dueDate: ['', [Validators.required]],
+      priority: ['', Validators.required],
+      subtasks: this.fb.array([]), // For task-specific subtasks
     });
   }
 
   ngOnInit() {
-    if (this.productService.productToEdit) {
+    const taskToEdit = this.taskService.getTaskToEdit();
+    if (taskToEdit) {
       this.isEditMode = true;
-      this.form.patchValue(this.productService.productToEdit);
-      const featuresArray = this.fb.array([]);
-      for (let feature of this.productService.productToEdit.features) {
-        featuresArray.push(this.fb.group(feature));
+      this.form.patchValue(taskToEdit);
+      const subtasksArray = this.fb.array([]);
+      for (let subtask of taskToEdit.subtasks) {
+        subtasksArray.push(
+          this.fb.group({
+            subtaskName: [subtask.subtaskName, [Validators.required, Validators.minLength(3)]],
+            subtaskStatus: [subtask.subtaskStatus, Validators.required],
+          })
+        );
       }
-      this.form.setControl('features', featuresArray);
+      this.form.setControl('subtasks', subtasksArray);
     }
   }
 
-  get features(): FormArray {
-    return this.form.get('features') as FormArray;
+  get subtasks(): FormArray {
+    return this.form.get('subtasks') as FormArray;
   }
 
-  addFeature() {
-    this.features.push(
+  addSubtask() {
+    this.subtasks.push(
       this.fb.group({
-        featureName: ['', [Validators.required, Validators.minLength(3)]],
-        featureValue: ['', Validators.required],
+        subtaskName: ['', [Validators.required, Validators.minLength(3)]],
+        subtaskStatus: [false, Validators.required],
       })
     );
   }
 
-  removeFeature(index: number) {
-    this.features.removeAt(index);
+  removeSubtask(index: number) {
+    this.subtasks.removeAt(index);
   }
 
   submit() {
     if (this.form.valid) {
       if (this.isEditMode) {
-        this.productService.updateProduct(this.form.value);
+        this.taskService.updateTask(this.form.value);
       } else {
-        this.productService.addProduct(this.form.value);
+        this.taskService.addTask(this.form.value);
       }
-      this.form.reset();
-      this.isEditMode = false;
+      this.resetForm();
     }
+  }
+
+  private resetForm() {
+    this.form.reset();
+    this.subtasks.clear();
+    this.isEditMode = false;
   }
 }
