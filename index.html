@@ -1,53 +1,42 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TaskService } from '../task.service';
+<div formArrayName="subtasks">
+  <div *ngFor="let subtask of subtasks.controls; let i = index" [formGroupName]="i">
+    <label for="{{ 'subtaskName' + i }}">Subtask Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="{{ 'subtaskName' + i }}"
+      formControlName="subtaskName"
+    >
+    <!-- Error Handling -->
+    <span
+      *ngIf="subtask.get('subtaskName')?.errors?.['required'] && subtask.get('subtaskName')?.touched"
+      class="errmsg"
+      id="subtaskNameError-{{i}}"
+    >
+      Subtask Name is required.
+    </span>
+    <span
+      *ngIf="subtask.get('subtaskName')?.errors?.['minlength'] && subtask.get('subtaskName')?.touched"
+      class="errmsg"
+      id="subtaskNameError-{{i}}"
+    >
+      Subtask Name must be at least 3 characters.
+    </span>
 
-@Component({
-  selector: 'app-task-form',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
-  templateUrl: './task-form.component.html',
-  styleUrls: ['./task-form.component.css'],
-})
-export class TaskFormComponent {
-  tasklist: any[] = [];
-  form: FormGroup;
-  errmsg!: string;
-
-  constructor(private fb: FormBuilder, private taskService: TaskService) {
-    this.form = this.fb.group({
-      taskName: ['', [Validators.required, Validators.minLength(3)]],
-      dueDate: ['', [Validators.required]],
-      priority: ['', [Validators.required]],
-      subtasks: this.fb.array([]),
-    });
-  }
-
-  get subtasks() {
-    return this.form.get('subtasks') as FormArray;
-  }
-
-  addSubtask() {
-    this.subtasks.push(
-      this.fb.group({
-        subtaskName: ['', [Validators.required, Validators.minLength(3)]],
-        subtaskStatus: [false],
-      })
-    );
-  }
-
-  removeSubtask(index: number) {
-    this.subtasks.removeAt(index);
-  }
-
-  submit() {
-    if (this.form.valid) {
-      console.log(this.form.value);
-      this.tasklist.push(this.form.value);
-      this.errmsg = ''; // Clear error message on successful submission
-    } else {
-      this.errmsg = 'All fields are required';
-    }
-  }
-}
+    <label for="{{ 'subtaskStatus' + i }}">Subtask Status</label>
+    <input
+      type="checkbox"
+      class="form-check-input"
+      id="{{ 'subtaskStatus' + i }}"
+      formControlName="subtaskStatus"
+    ><br>
+    <button
+      type="button"
+      (click)="removeSubtask(i)"
+      class="btn btn-danger"
+      id="removesubtaskName-{{i}}"
+    >
+      Remove Subtask
+    </button>
+  </div>
+</div>
