@@ -1,27 +1,15 @@
-class Order
-{
-    long OrderId { get; set; }
+public class Solution {
+    public int RemoveElement(int[] nums, int val) {
 
-    int Items { get; set; }
-
-    float TotalAmount { get; set; }
-
-
-
-    public void setOrderDetails(long orderId, int items, float totalAmount)
-    {
-        OrderId = orderId;
-        Items = items;
-        TotalAmount = totalAmount;
+       ArrayList resultList = new ArrayList();
+        for(int i=0; i<nums.Length; i++){
+            if(nums[i]!=val){
+               resultList.Add(nums[i]);
+            }
+           
+        
+        }
+        return resultList.Count;
+        
     }
-
-    public void DisplayOrderDetails()
-    {
-        Console.WriteLine($"Order ID: {OrderId}");
-        Console.WriteLine($"Items: {Items}");
-        Console.WriteLine($"Total Amount: {TotalAmount}");
-    }
-
-
-
 }
