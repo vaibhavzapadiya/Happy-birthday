@@ -1,15 +1,11 @@
 public class Solution {
-    public int RemoveElement(int[] nums, int val) {
-
-       ArrayList resultList = new ArrayList();
-        for(int i=0; i<nums.Length; i++){
-            if(nums[i]!=val){
-               resultList.Add(nums[i]);
-            }
-           
-        
-        }
-        return resultList.Count;
-        
+    public int RemoveDuplicates(int[] nums) {
+        HashSet<int>  h1= new HashSet<int>();
+      for(int i=0; i<nums.Length; i++){
+        h1.Add(nums[i]);
+      }
+      
+      return h1.Count;
     }
+     
 }
