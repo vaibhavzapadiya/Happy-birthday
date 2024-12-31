@@ -1,64 +1,27 @@
-form: FormGroup;
-  isEditMode: boolean = false;
+class Order
+{
+    long OrderId { get; set; }
 
-  constructor(private fb: FormBuilder, private taskService: TaskService) {
-    this.form = this.fb.group({
-      taskName: ['', [Validators.required, Validators.minLength(3)]],
-      dueDate: ['', [Validators.required]],
-      priority: ['', Validators.required],
-      subtasks: this.fb.array([]), // For task-specific subtasks
-    });
-  }
+    int Items { get; set; }
 
-  ngOnInit() {
-    const taskToEdit = this.taskService.getTaskToEdit();
-    if (taskToEdit) {
-      this.isEditMode = true;
-      this.form.patchValue(taskToEdit);
-      const subtasksArray = this.fb.array([]);
-      for (let subtask of taskToEdit.subtasks) {
-        subtasksArray.push(
-          this.fb.group({
-            subtaskName: [subtask.subtaskName, [Validators.required, Validators.minLength(3)]],
-            subtaskStatus: [subtask.subtaskStatus, Validators.required],
-          })
-        );
-      }
-      this.form.setControl('subtasks', subtasksArray);
+    float TotalAmount { get; set; }
+
+
+
+    public void setOrderDetails(long orderId, int items, float totalAmount)
+    {
+        OrderId = orderId;
+        Items = items;
+        TotalAmount = totalAmount;
     }
-  }
 
-  get subtasks(): FormArray {
-    return this.form.get('subtasks') as FormArray;
-  }
-
-  addSubtask() {
-    this.subtasks.push(
-      this.fb.group({
-        subtaskName: ['', [Validators.required, Validators.minLength(3)]],
-        subtaskStatus: [false, Validators.required],
-      })
-    );
-  }
-
-  removeSubtask(index: number) {
-    this.subtasks.removeAt(index);
-  }
-
-  submit() {
-    if (this.form.valid) {
-      if (this.isEditMode) {
-        this.taskService.updateTask(this.form.value);
-      } else {
-        this.taskService.addTask(this.form.value);
-      }
-      this.resetForm();
+    public void DisplayOrderDetails()
+    {
+        Console.WriteLine($"Order ID: {OrderId}");
+        Console.WriteLine($"Items: {Items}");
+        Console.WriteLine($"Total Amount: {TotalAmount}");
     }
-  }
 
-  private resetForm() {
-    this.form.reset();
-    this.subtasks.clear();
-    this.isEditMode = false;
-  }
+
+
 }
