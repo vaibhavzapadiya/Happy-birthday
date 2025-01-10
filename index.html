@@ -86,3 +86,13 @@ VALUES
 (1, 2), -- Treatment 1 also uses Drug 2
 (2, 2), -- Treatment 2 uses Drug 2
 (3, 3); -- Treatment 3 uses Drug 3
+
+
+-- Drop tables in order of foreign key dependencies
+DROP TABLE IF EXISTS TreatmentDrugs;
+DROP TABLE IF EXISTS TreatmentDetails;
+DROP TABLE IF EXISTS Drugs;
+DROP TABLE IF EXISTS HealthcareAssistants;
+DROP TABLE IF EXISTS Patients;
+DROP TABLE IF EXISTS Doctors;
+DROP TABLE IF EXISTS Department;
