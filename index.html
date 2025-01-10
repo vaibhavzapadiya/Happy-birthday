@@ -1,20 +1,30 @@
-public class Solution {
-    public int RemoveDuplicates(int[] nums) {
-        if (nums == null || nums.Length == 0) {
-            return 0; // Handle null or empty array
-        }
+create table Doctors(
+ DoctorId int primary key ,
+ DoctorName varchar(100) NOT NULL,
+ DepartmentId int FOREIGN KEY REFERENCES Department(DepartmentId)
 
-        HashSet<int> uniqueNumbers = new HashSet<int>();
-        int k = 0;
 
-        for (int i = 0; i < nums.Length; i++) {
-            if (uniqueNumbers.Add(nums[i])) { // Add returns true for unique elements
-                nums[k] = nums[i]; // Modify nums in-place
-                k++;
-            }
-        }
+);
 
-        // Optional: You could still return uniqueNumbers.Count, but k is preferred for clarity.
-        return k;
-    }
-}
+create table Department(
+ DepartmentId int primary key,
+ DepartmentName varchar(50) not null,
+
+);
+
+create table Patients(
+ PatientId int primary key,
+ Patientname varchar(100) not null
+
+);
+
+create table TreatmentDetails(
+ TreatmentId int primary key,
+ Description varchar(max) ,
+ PatientId int FOREIGN KEY REFERENCES Patients(PatientId),
+  DoctorId int FOREIGN KEY REFERENCES Doctors(DoctorId),
+
+ DepartmentId int FOREIGN KEY REFERENCES Department(DepartmentId)
+
+
+);
