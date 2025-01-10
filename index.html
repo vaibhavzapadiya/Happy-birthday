@@ -1,32 +1,32 @@
 CREATE TABLE Department (
-    DepartmentId INT PRIMARY KEY,
+    DepartmentId INT IDENTITY(1,1) PRIMARY KEY,
     DepartmentName VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE Doctors (
-    DoctorId INT PRIMARY KEY,
+    DoctorId INT IDENTITY(1,1) PRIMARY KEY,
     DoctorName VARCHAR(100) NOT NULL,
     DepartmentId INT FOREIGN KEY REFERENCES Department(DepartmentId)
 );
 
 CREATE TABLE Patients (
-    PatientId INT PRIMARY KEY,
+    PatientId INT IDENTITY(1,1) PRIMARY KEY,
     PatientName VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE HealthcareAssistants (
-    AssistantsId INT PRIMARY KEY,
+    AssistantsId INT IDENTITY(1,1) PRIMARY KEY,
     AssistantName VARCHAR(100) NOT NULL,
     DepartmentId INT FOREIGN KEY REFERENCES Department(DepartmentId)
 );
 
 CREATE TABLE Drugs (
-    DrugId INT PRIMARY KEY,
+    DrugId INT IDENTITY(1,1) PRIMARY KEY,
     DrugName VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE TreatmentDetails (
-    TreatmentId INT PRIMARY KEY,
+    TreatmentId INT IDENTITY(1,1) PRIMARY KEY,
     Description VARCHAR(MAX),
     PatientId INT FOREIGN KEY REFERENCES Patients(PatientId),
     DoctorId INT FOREIGN KEY REFERENCES Doctors(DoctorId),
@@ -39,60 +39,3 @@ CREATE TABLE TreatmentDrugs (
     DrugId INT FOREIGN KEY REFERENCES Drugs(DrugId),
     PRIMARY KEY (TreatmentId, DrugId)
 );
-
--- Departments
-INSERT INTO Department (DepartmentId, DepartmentName)
-VALUES (1, 'Cardiology'), (2, 'Neurology'), (3, 'Oncology');
-
--- Doctors
-INSERT INTO Doctors (DoctorId, DoctorName, DepartmentId)
-VALUES 
-(1, 'Dr. Arjun Reddy', 1),
-(2, 'Dr. Priya Sharma', 2),
-(3, 'Dr. Sameer Khan', 3);
-
--- Patients
-INSERT INTO Patients (PatientId, PatientName)
-VALUES 
-(1, 'Rajesh Kumar'),
-(2, 'Sita Verma'),
-(3, 'Anil Gupta');
-
--- Healthcare Assistants
-INSERT INTO HealthcareAssistants (AssistantsId, AssistantName, DepartmentId)
-VALUES 
-(1, 'Ramesh Patel', 1),
-(2, 'Suman Mehta', 2),
-(3, 'Neha Singh', 3);
-
--- Drugs
-INSERT INTO Drugs (DrugId, DrugName)
-VALUES 
-(1, 'Paracetamol'),
-(2, 'Aspirin'),
-(3, 'Metformin');
-
--- Treatment Details
-INSERT INTO TreatmentDetails (TreatmentId, Description, PatientId, DoctorId, DepartmentId, AssistantsId)
-VALUES 
-(1, 'Treatment for fever', 1, 1, 1, 1),
-(2, 'Migraine management', 2, 2, 2, 2),
-(3, 'Cancer therapy', 3, 3, 3, 3);
-
--- Treatment Drugs (Mapping Treatments to Drugs)
-INSERT INTO TreatmentDrugs (TreatmentId, DrugId)
-VALUES 
-(1, 1), -- Treatment 1 uses Drug 1
-(1, 2), -- Treatment 1 also uses Drug 2
-(2, 2), -- Treatment 2 uses Drug 2
-(3, 3); -- Treatment 3 uses Drug 3
-
-
--- Drop tables in order of foreign key dependencies
-DROP TABLE IF EXISTS TreatmentDrugs;
-DROP TABLE IF EXISTS TreatmentDetails;
-DROP TABLE IF EXISTS Drugs;
-DROP TABLE IF EXISTS HealthcareAssistants;
-DROP TABLE IF EXISTS Patients;
-DROP TABLE IF EXISTS Doctors;
-DROP TABLE IF EXISTS Department;
