@@ -1,47 +1,88 @@
-create table Doctors(
- DoctorId int primary key ,
- DoctorName varchar(100) NOT NULL,
- DepartmentId int FOREIGN KEY REFERENCES Department(DepartmentId)
-
-
+CREATE TABLE Department (
+    DepartmentId INT PRIMARY KEY,
+    DepartmentName VARCHAR(50) NOT NULL
 );
 
-
-create table Department(
- DepartmentId int primary key,
- DepartmentName varchar(50) not null,
-
+CREATE TABLE Doctors (
+    DoctorId INT PRIMARY KEY,
+    DoctorName VARCHAR(100) NOT NULL,
+    DepartmentId INT FOREIGN KEY REFERENCES Department(DepartmentId)
 );
 
-create table Patients(
- PatientId int primary key,
- Patientname varchar(100) not null
-
+CREATE TABLE Patients (
+    PatientId INT PRIMARY KEY,
+    PatientName VARCHAR(100) NOT NULL
 );
 
-create table TreatmentDetails(
- TreatmentId int primary key,
- Description varchar(max) ,
- PatientId int FOREIGN KEY REFERENCES Patients(PatientId),
-  DoctorId int FOREIGN KEY REFERENCES Doctors(DoctorId),
-
- DepartmentId int FOREIGN KEY REFERENCES Department(DepartmentId)
- AssistantsId int foreign key references HealthcareAssistants(AssistantsId)
-
+CREATE TABLE HealthcareAssistants (
+    AssistantsId INT PRIMARY KEY,
+    AssistantName VARCHAR(100) NOT NULL,
+    DepartmentId INT FOREIGN KEY REFERENCES Department(DepartmentId)
 );
 
-create table HealthcareAssistants(
- AssistantsId int primary key,
- AssistantName varchar(100) not null, 
- DepartmentId int FOREIGN KEY REFERENCES Department(DepartmentId)
+CREATE TABLE Drugs (
+    DrugId INT PRIMARY KEY,
+    DrugName VARCHAR(100) NOT NULL
 );
 
-create table Drugs(
- DrugId int primary key,
- DrugName varchar(100) not null
-
+CREATE TABLE TreatmentDetails (
+    TreatmentId INT PRIMARY KEY,
+    Description VARCHAR(MAX),
+    PatientId INT FOREIGN KEY REFERENCES Patients(PatientId),
+    DoctorId INT FOREIGN KEY REFERENCES Doctors(DoctorId),
+    DepartmentId INT FOREIGN KEY REFERENCES Department(DepartmentId),
+    AssistantsId INT FOREIGN KEY REFERENCES HealthcareAssistants(AssistantsId)
 );
 
+CREATE TABLE TreatmentDrugs (
+    TreatmentId INT FOREIGN KEY REFERENCES TreatmentDetails(TreatmentId),
+    DrugId INT FOREIGN KEY REFERENCES Drugs(DrugId),
+    PRIMARY KEY (TreatmentId, DrugId)
+);
 
+-- Departments
+INSERT INTO Department (DepartmentId, DepartmentName)
+VALUES (1, 'Cardiology'), (2, 'Neurology'), (3, 'Oncology');
 
- 
+-- Doctors
+INSERT INTO Doctors (DoctorId, DoctorName, DepartmentId)
+VALUES 
+(1, 'Dr. Arjun Reddy', 1),
+(2, 'Dr. Priya Sharma', 2),
+(3, 'Dr. Sameer Khan', 3);
+
+-- Patients
+INSERT INTO Patients (PatientId, PatientName)
+VALUES 
+(1, 'Rajesh Kumar'),
+(2, 'Sita Verma'),
+(3, 'Anil Gupta');
+
+-- Healthcare Assistants
+INSERT INTO HealthcareAssistants (AssistantsId, AssistantName, DepartmentId)
+VALUES 
+(1, 'Ramesh Patel', 1),
+(2, 'Suman Mehta', 2),
+(3, 'Neha Singh', 3);
+
+-- Drugs
+INSERT INTO Drugs (DrugId, DrugName)
+VALUES 
+(1, 'Paracetamol'),
+(2, 'Aspirin'),
+(3, 'Metformin');
+
+-- Treatment Details
+INSERT INTO TreatmentDetails (TreatmentId, Description, PatientId, DoctorId, DepartmentId, AssistantsId)
+VALUES 
+(1, 'Treatment for fever', 1, 1, 1, 1),
+(2, 'Migraine management', 2, 2, 2, 2),
+(3, 'Cancer therapy', 3, 3, 3, 3);
+
+-- Treatment Drugs (Mapping Treatments to Drugs)
+INSERT INTO TreatmentDrugs (TreatmentId, DrugId)
+VALUES 
+(1, 1), -- Treatment 1 uses Drug 1
+(1, 2), -- Treatment 1 also uses Drug 2
+(2, 2), -- Treatment 2 uses Drug 2
+(3, 3); -- Treatment 3 uses Drug 3
