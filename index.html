@@ -1,41 +1,55 @@
-CREATE TABLE Department (
-    DepartmentId INT IDENTITY(1,1) PRIMARY KEY,
-    DepartmentName VARCHAR(50) NOT NULL
-);
+-- Insert into Department
+INSERT INTO Department (DepartmentName) VALUES
+('Cardiology'),
+('Neurology'),
+('Orthopedics'),
+('Pediatrics'),
+('General Medicine');
 
-CREATE TABLE Doctors (
-    DoctorId INT IDENTITY(1,1) PRIMARY KEY,
-    DoctorName VARCHAR(100) NOT NULL,
-    DepartmentId INT FOREIGN KEY REFERENCES Department(DepartmentId)
-);
+-- Insert into Doctors
+INSERT INTO Doctors (DoctorName, DepartmentId) VALUES
+('Dr. Ravi Kumar', 1),
+('Dr. Priya Sharma', 2),
+('Dr. Amit Singh', 3),
+('Dr. Neha Verma', 4),
+('Dr. Sandeep Joshi', 5);
 
-CREATE TABLE Patients (
-    PatientId INT IDENTITY(1,1) PRIMARY KEY,
-    PatientName VARCHAR(100) NOT NULL
-);
+-- Insert into Patients
+INSERT INTO Patients (PatientName) VALUES
+('Rajesh Kumar'),
+('Anjali Patel'),
+('Vikram Yadav'),
+('Pooja Desai'),
+('Amit Malhotra');
 
-CREATE TABLE HealthcareAssistants (
-    AssistantsId INT IDENTITY(1,1) PRIMARY KEY,
-    AssistantName VARCHAR(100) NOT NULL,
-    DepartmentId INT FOREIGN KEY REFERENCES Department(DepartmentId)
-);
+-- Insert into HealthcareAssistants
+INSERT INTO HealthcareAssistants (AssistantName, DepartmentId) VALUES
+('Sita Devi', 1),
+('Sunita Rani', 2),
+('Geeta Mehta', 3),
+('Aarti Sharma', 4),
+('Kiran Yadav', 5);
 
-CREATE TABLE Drugs (
-    DrugId INT IDENTITY(1,1) PRIMARY KEY,
-    DrugName VARCHAR(100) NOT NULL
-);
+-- Insert into Drugs
+INSERT INTO Drugs (DrugName) VALUES
+('Aspirin'),
+('Paracetamol'),
+('Ibuprofen'),
+('Amoxicillin'),
+('Metformin');
 
-CREATE TABLE TreatmentDetails (
-    TreatmentId INT IDENTITY(1,1) PRIMARY KEY,
-    Description VARCHAR(MAX),
-    PatientId INT FOREIGN KEY REFERENCES Patients(PatientId),
-    DoctorId INT FOREIGN KEY REFERENCES Doctors(DoctorId),
-    DepartmentId INT FOREIGN KEY REFERENCES Department(DepartmentId),
-    AssistantsId INT FOREIGN KEY REFERENCES HealthcareAssistants(AssistantsId)
-);
+-- Insert into TreatmentDetails
+INSERT INTO TreatmentDetails (Description, PatientId, DoctorId, DepartmentId, AssistantsId) VALUES
+('Cardiac Check-up', 1, 1, 1, 1),
+('Neurological Evaluation', 2, 2, 2, 2),
+('Bone Fracture Treatment', 3, 3, 3, 3),
+('Pediatric Consultation', 4, 4, 4, 4),
+('Diabetes Management', 5, 5, 5, 5);
 
-CREATE TABLE TreatmentDrugs (
-    TreatmentId INT FOREIGN KEY REFERENCES TreatmentDetails(TreatmentId),
-    DrugId INT FOREIGN KEY REFERENCES Drugs(DrugId),
-    PRIMARY KEY (TreatmentId, DrugId)
-);
+-- Insert into TreatmentDrugs
+INSERT INTO TreatmentDrugs (TreatmentId, DrugId) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
