@@ -1,30 +1,35 @@
-create table Doctors(
- DoctorId int primary key ,
- DoctorName varchar(100) NOT NULL,
- DepartmentId int FOREIGN KEY REFERENCES Department(DepartmentId)
+-- Insert sample data for Department
+INSERT INTO Department (DepartmentId, DepartmentName)
+VALUES 
+(1, 'Cardiology'),
+(2, 'Neurology'),
+(3, 'Orthopedics'),
+(4, 'Pediatrics'),
+(5, 'Dermatology');
 
+-- Insert sample data for Doctors
+INSERT INTO Doctors (DoctorId, DoctorName, DepartmentId)
+VALUES
+(1, 'Dr. Arjun Sharma', 1),
+(2, 'Dr. Priya Nair', 2),
+(3, 'Dr. Vikram Patel', 3),
+(4, 'Dr. Sneha Desai', 4),
+(5, 'Dr. Anil Verma', 5);
 
-);
+-- Insert sample data for Patients
+INSERT INTO Patients (PatientId, PatientName)
+VALUES
+(1, 'Rohan Mehta'),
+(2, 'Sita Iyer'),
+(3, 'Arjun Reddy'),
+(4, 'Pooja Singh'),
+(5, 'Kiran Kumar');
 
-create table Department(
- DepartmentId int primary key,
- DepartmentName varchar(50) not null,
-
-);
-
-create table Patients(
- PatientId int primary key,
- Patientname varchar(100) not null
-
-);
-
-create table TreatmentDetails(
- TreatmentId int primary key,
- Description varchar(max) ,
- PatientId int FOREIGN KEY REFERENCES Patients(PatientId),
-  DoctorId int FOREIGN KEY REFERENCES Doctors(DoctorId),
-
- DepartmentId int FOREIGN KEY REFERENCES Department(DepartmentId)
-
-
-);
+-- Insert sample data for TreatmentDetails
+INSERT INTO TreatmentDetails (TreatmentId, Description, PatientId, DoctorId, DepartmentId)
+VALUES
+(1, 'Heart Bypass Surgery', 1, 1, 1),
+(2, 'MRI Brain Scan', 2, 2, 2),
+(3, 'Knee Replacement', 3, 3, 3),
+(4, 'Routine Checkup', 4, 4, 4),
+(5, 'Skin Allergy Treatment', 5, 5, 5);
