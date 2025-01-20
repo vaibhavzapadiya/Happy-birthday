@@ -1,60 +1,28 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json;
-using WebApplication1.DTOs;
-using WebApplication1.Models;
-
-namespace WebApplication1
+public async Task<IEnumerable<UserDTO>> GetAllUser()
 {
-    public class UserService : ItemService
+    string cacheKey = $"AllUsers";
+    var cachedItem = await _cache.GetStringAsync(cacheKey);
+
+    if (cachedItem != null)
     {
-        private readonly IConfiguration _configuration;
-        private readonly UserLoginContext _context;
-        private readonly IDistributedCache _cache;
-        private readonly TimeSpan _cacheExpiry = TimeSpan.FromMinutes(5);
-
-        public UserService(IConfiguration configuration, UserLoginContext context, IDistributedCache cache)
-        {
-            _configuration = configuration;
-            _context = context;
-            _cache = cache;
-        }
-
-        public async Task<IEnumerable<UserDTO>> GetAllUser()
-        {
-
-
-            var result = await _context.UserLogins.ToListAsync();
-
-
-            var user = result.Select(user => new UserDTO
-            {
-                UserName = user.UserName
-            });
-
-            return user;
-
-            string cacheKey = $"Item_";
-            var cachedItem = await _cache.GetStringAsync();
-            if (cachedItem != null)
-            {
-                Console.WriteLine("✅ Item retrieved from cache!");
-                return JsonConvert.DeserializeObject<UserDTO>(cachedItem);
-            }
-
-            
-            var item = await _context.UserLogins.ToListAsync();
-           
-            await _cache.SetStringAsync(
-                cacheKey,
-                JsonConvert.SerializeObject(item),
-                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = _cacheExpiry }
-            );
-
-            Console.WriteLine("🔄 Item added to cache.");
-            return item;
-
-        }
+        Console.WriteLine("✅ Item retrieved from cache!");
+        return JsonConvert.DeserializeObject<IEnumerable<UserDTO>>(cachedItem);
     }
+
+    var result = await _context.UserLogins.ToListAsync();
+
+    var userDtos = result.Select(user => new UserDTO
+    {
+        UserName = user.UserName
+    });
+
+    // Add data to the cache
+    await _cache.SetStringAsync(
+        cacheKey,
+        JsonConvert.SerializeObject(userDtos),
+        new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = _cacheExpiry }
+    );
+
+    Console.WriteLine("🔄 Item added to cache.");
+    return userDtos;
 }
