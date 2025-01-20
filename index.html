@@ -1,55 +1,60 @@
--- Insert into Department
-INSERT INTO Department (DepartmentName) VALUES
-('Cardiology'),
-('Neurology'),
-('Orthopedics'),
-('Pediatrics'),
-('General Medicine');
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
+using WebApplication1.DTOs;
+using WebApplication1.Models;
 
--- Insert into Doctors
-INSERT INTO Doctors (DoctorName, DepartmentId) VALUES
-('Dr. Ravi Kumar', 1),
-('Dr. Priya Sharma', 2),
-('Dr. Amit Singh', 3),
-('Dr. Neha Verma', 4),
-('Dr. Sandeep Joshi', 5);
+namespace WebApplication1
+{
+    public class UserService : ItemService
+    {
+        private readonly IConfiguration _configuration;
+        private readonly UserLoginContext _context;
+        private readonly IDistributedCache _cache;
+        private readonly TimeSpan _cacheExpiry = TimeSpan.FromMinutes(5);
 
--- Insert into Patients
-INSERT INTO Patients (PatientName) VALUES
-('Rajesh Kumar'),
-('Anjali Patel'),
-('Vikram Yadav'),
-('Pooja Desai'),
-('Amit Malhotra');
+        public UserService(IConfiguration configuration, UserLoginContext context, IDistributedCache cache)
+        {
+            _configuration = configuration;
+            _context = context;
+            _cache = cache;
+        }
 
--- Insert into HealthcareAssistants
-INSERT INTO HealthcareAssistants (AssistantName, DepartmentId) VALUES
-('Sita Devi', 1),
-('Sunita Rani', 2),
-('Geeta Mehta', 3),
-('Aarti Sharma', 4),
-('Kiran Yadav', 5);
+        public async Task<IEnumerable<UserDTO>> GetAllUser()
+        {
 
--- Insert into Drugs
-INSERT INTO Drugs (DrugName) VALUES
-('Aspirin'),
-('Paracetamol'),
-('Ibuprofen'),
-('Amoxicillin'),
-('Metformin');
 
--- Insert into TreatmentDetails
-INSERT INTO TreatmentDetails (Description, PatientId, DoctorId, DepartmentId, AssistantsId) VALUES
-('Cardiac Check-up', 1, 1, 1, 1),
-('Neurological Evaluation', 2, 2, 2, 2),
-('Bone Fracture Treatment', 3, 3, 3, 3),
-('Pediatric Consultation', 4, 4, 4, 4),
-('Diabetes Management', 5, 5, 5, 5);
+            var result = await _context.UserLogins.ToListAsync();
 
--- Insert into TreatmentDrugs
-INSERT INTO TreatmentDrugs (TreatmentId, DrugId) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5);
+
+            var user = result.Select(user => new UserDTO
+            {
+                UserName = user.UserName
+            });
+
+            return user;
+
+            string cacheKey = $"Item_";
+            var cachedItem = await _cache.GetStringAsync();
+            if (cachedItem != null)
+            {
+                Console.WriteLine("✅ Item retrieved from cache!");
+                return JsonConvert.DeserializeObject<UserDTO>(cachedItem);
+            }
+
+            
+            var item = await _context.UserLogins.ToListAsync();
+           
+            await _cache.SetStringAsync(
+                cacheKey,
+                JsonConvert.SerializeObject(item),
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = _cacheExpiry }
+            );
+
+            Console.WriteLine("🔄 Item added to cache.");
+            return item;
+
+        }
+    }
+}
