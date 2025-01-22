@@ -1,28 +1,55 @@
-public async Task<IEnumerable<UserDTO>> GetAllUser()
-{
-    string cacheKey = $"AllUsers";
-    var cachedItem = await _cache.GetStringAsync(cacheKey);
+Create table Student(
+StudentId int primary key identity(1,1),
+StudentName varchar(100) not null,
+Email varchar(50) not null,
+Isdeleted bit default 0 not null,
+DeptId int foreign key references Department(DepartmentId) not null,
+Username varchar(50) unique not null,
+Password varchar(50) not null,
 
-    if (cachedItem != null)
-    {
-        Console.WriteLine("✅ Item retrieved from cache!");
-        return JsonConvert.DeserializeObject<IEnumerable<UserDTO>>(cachedItem);
-    }
 
-    var result = await _context.UserLogins.ToListAsync();
 
-    var userDtos = result.Select(user => new UserDTO
-    {
-        UserName = user.UserName
-    });
+);
 
-    // Add data to the cache
-    await _cache.SetStringAsync(
-        cacheKey,
-        JsonConvert.SerializeObject(userDtos),
-        new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = _cacheExpiry }
-    );
 
-    Console.WriteLine("🔄 Item added to cache.");
-    return userDtos;
-}
+create table Department(
+DepartmentId int primary key identity(1,1),
+DepartmentName varchar(50) not null
+
+);
+
+create table Faculty(
+FacultyId int primary key identity(1,1),
+FacultyName varchar(100) not null 
+
+
+);
+
+create table Fact_Dept(
+FacultyId int foreign key references Faculty(FacultyId) not null,
+DeptId int foreign key references Department(DepartmentId) not null,
+primary key(FacultyId,DeptId) 
+
+
+
+
+);
+
+create table StudentMarks(
+StudentId int foreign key references Student(StudentId) not null,
+subject1 decimal not null,
+subject2 decimal not null,
+primary key (StudentId)
+
+
+
+);
+
+
+create table LoginCredentials(
+
+Username varchar(50) primary key,
+Password varchar(50) not null,
+
+
+);
